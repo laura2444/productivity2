@@ -1,17 +1,45 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>
-      Tab 1 Hola mundo
-    </ion-title>
+      <div class="header-container">
+        <!-- Título -->
+        <ion-title class="custom-title">Todas las tareas</ion-title>
+  
+        <!-- Botón flotante al lado del título -->
+        <ion-fab  class="fab-header">
+          <ion-fab-button class="small-button" [routerLink]="['/tabs/tab2']">
+            <ion-icon name="add"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+      </div>
+
   </ion-toolbar>
+  <ion-searchbar [animated]="true" placeholder="Animated" mode="ios"></ion-searchbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 1</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-card class="container-card" >
+  <div class="card">
+      <div class="card-content">
+        <ion-thumbnail slot="start" class="color-box"></ion-thumbnail>
 
-  <app-explore-container name="Tab 1 page"></app-explore-container>
+  
+        <div class="card-text">
+          <ion-card-header >
+            <ion-card-title>Desarrollo de software</ion-card-title>
+            <ion-card-subtitle>2:30 PM-6:30PM  24/03/2025</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            [En progreso]
+            <ion-button class="button-subtarea"[routerLink]="['/tabs/tab3']">Subtareas</ion-button>
+          </ion-card-content>
+  
+        </div>
+      </div>
+    </div>
+    </ion-card>
+
+
+  
+
+  <!--<app-explore-container name="Tab 1 page"></app-explore-container>-->
 </ion-content>
