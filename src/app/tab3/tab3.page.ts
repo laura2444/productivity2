@@ -8,7 +8,6 @@ import { IonHeader, IonToolbar, IonTitle, IonContent, IonBackButton,
   IonSelectOption,
   IonIcon,
   } from '@ionic/angular/standalone';
-import { ExploreContainerComponent } from '../explore-container/explore-container.component';
 import { addIcons } from 'ionicons';
 import { addCircleOutline } from 'ionicons/icons';
 
