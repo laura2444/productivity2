@@ -1,0 +1,77 @@
+.header-container {
+    display: flex;
+    padding: 10px 10px; // Ajuste de espacio
+    background-color: #211C40; 
+  }
+  
+  .custom-title {
+    text-align: left; // Asegura alineación a la izquierda
+    font-size: 25px;
+    
+  }
+
+  
+
+  .card-content {
+    display: flex;
+    align-items: center; /* Centra verticalmente */
+    background-color: #D0B0D9;
+
+}
+  
+.card-text {
+    flex: 1; /* Hace que el texto ocupe el espacio restante */
+    color:black;
+    font-weight: bold;
+}
+
+
+ion-card-title, ion-card-subtitle {
+    color: black;
+}
+
+ion-card-title{
+    font-weight: bold;
+}
+
+
+.color-box {
+    width: 67px;
+    height: 65px;
+    background-color: #F2E4D8;
+    border-radius: 8px  ;
+}
+  
+.container-card{
+    margin: 30px 20px;
+    background-color: #D0B0D9;
+    border-radius: 18px  ;
+    color:black;
+
+}
+
+.card{
+    padding: 0px 10px; // Ajuste de espacio
+    background-color: #D0B0D9;
+}
+.button-subtarea{
+    width: auto;
+    height: auto;
+    font-size: 12px;
+    --color: white;
+    --background: #443673;
+    --border-radius:12px;
+ 
+}
+
+.date{
+    text-align: center;
+    font-weight: bold;
+}
+
+ion-icon {
+    display: inline-block;
+    font-size: 30px;
+    color: rgb(255, 255, 255);
+  }
+  

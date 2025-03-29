@@ -1,13 +1,46 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>tab4</ion-title>
+
+  <ion-toolbar >
+    <div class="header-container">
+      <ion-buttons slot="start">
+        <ion-back-button default-href="#"></ion-back-button>
+      </ion-buttons>
+      <ion-title class="custom-title">
+        <ion-icon name="bar-chart-outline"></ion-icon>
+        Estadisticas</ion-title>
+    </div>
+
   </ion-toolbar>
+
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">tab4</ion-title>
-    </ion-toolbar>
-  </ion-header>
+
+  <app-progress-chart></app-progress-chart>
+
+
+  <h3 class="date">Hoy, {{ today | date: 'MMM d'}}</h3>
+
+
+
+  <ion-card class="container-card" >
+
+    <div class="card">
+        <div class="card-content">
+          <ion-thumbnail slot="start" class="color-box"></ion-thumbnail>
+          <div class="card-text">
+            <ion-card-header >
+              <ion-card-title>Desarrollo de software</ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              [Completada]
+            </ion-card-content>
+    
+          </div>
+        </div>
+      </div>
+      </ion-card>
+  
+
+  <!--<app-explore-container name="Tab 1 page"></app-explore-container>-->
 </ion-content>
