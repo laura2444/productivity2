@@ -1,64 +1,24 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Chart, ArcElement, Tooltip } from 'chart.js';
-
-Chart.register(ArcElement, Tooltip);
+import { IonicModule } from '@ionic/angular';
 
 @Component({
   selector: 'app-progress-chart',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './progress-chart.component.html',
-  styleUrls: ['./progress-chart.component.scss']
+  styleUrls: ['./progress-chart.component.scss'],
+  standalone: true,
+  imports: [CommonModule, IonicModule]
 })
-export class ProgressChartComponent implements AfterViewInit {
-  @ViewChild('chartCanvas', { static: false }) chartCanvas!: ElementRef<HTMLCanvasElement>;
-  
-  tareasCompletadas =8; // 🔹 Cambia este valor para modificar el progreso
-  totalTareas = 20;
-  progress = 0;
-  chart!: Chart;
+export class ProgressChartComponent {
+  @Input() completed: number = 15;
+  @Input() total: number = 20;
 
-  ngAfterViewInit() {
-    this.calcularProgreso();
-    this.createChart();
+  get progress(): number {
+    return Math.min(100, Math.round((this.completed / this.total) * 100));
   }
 
-  calcularProgreso() {
-    this.progress = Math.min((this.tareasCompletadas / this.totalTareas) * 100, 100);
-  }
-
-  createChart() {
-    this.chart = new Chart(this.chartCanvas.nativeElement, {
-      type: 'doughnut',
-      data: {
-        labels: ['Progreso', 'Restante'],
-        datasets: [{
-          data: [this.progress, 100 - this.progress],
-          backgroundColor: ['blue', '#eee'],
-          borderWidth: 0
-        }]
-      },
-      options: {
-        responsive: true,
-        cutout: '80%',
-        plugins: {
-          tooltip: { enabled: false }
-        }
-      }
-    });
-  }
-
-  actualizarTareas(nuevasTareas: number) {
-    this.tareasCompletadas = nuevasTareas;
-    this.calcularProgreso();
-    this.updateChart();
-  }
-
-  updateChart() {
-    if (this.chart) {
-      this.chart.data.datasets[0].data = [this.progress, 100 - this.progress];
-      this.chart.update();
-    }
+  get strokeDashoffset(): number {
+    const circumference = 2 * Math.PI * 45;
+    return circumference - (this.progress / 100) * circumference;
   }
 }

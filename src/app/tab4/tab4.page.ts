@@ -14,8 +14,21 @@ import { ProgressChartComponent } from '../components/progress-chart/progress-ch
   standalone: true,
   imports: [IonIcon, IonFabButton, IonFab, IonSearchbar, IonCardTitle, IonCardHeader, IonCard, IonContent, IonHeader, IonTitle, IonToolbar, CommonModule, FormsModule, IonThumbnail, RouterModule, IonCardContent, IonButtons, IonBackButton, ProgressChartComponent]
 })
-export class Tab4Page implements OnInit, AfterViewInit {
-  @ViewChild(ProgressChartComponent) progressChart!: ProgressChartComponent;
+export class Tab4Page implements OnInit {
+  weekData = [
+    { label: 'L', completed: 3, total: 5 },
+    { label: 'M', completed: 4, total: 8 },
+    { label: 'Mi', completed: 2, total: 4 },
+    { label: 'J', completed: 5, total: 5 },
+    { label: 'V', completed: 1, total: 3 },
+    { label: 'S', completed: 0, total: 2 },
+    { label: 'D', completed: 2, total: 4 }
+  ];
+  
+  getPercentage(completed: number, total: number): number {
+    return total > 0 ? Math.round((completed / total) * 100) : 0;
+  }
+
   today: Date = new Date();
 
   constructor() {
@@ -24,18 +37,4 @@ export class Tab4Page implements OnInit, AfterViewInit {
 
   ngOnInit() {}
 
-  ngAfterViewInit() {
-    // Asegurar que el progreso se actualiza después de que la vista se renderice
-    setTimeout(() => {
-      this.actualizarProgresoDelUsuario(2); // 🔹 Cambia el número según el progreso deseado
-    }, 0);
-  }
-
-  actualizarProgresoDelUsuario(tareasCompletadas: number) {
-    if (this.progressChart) {
-      this.progressChart.actualizarTareas(tareasCompletadas);
-    } else {
-      console.warn('ProgressChartComponent aún no está disponible.');
-    }
-  }
 }

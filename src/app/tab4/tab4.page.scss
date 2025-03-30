@@ -75,3 +75,98 @@ ion-icon {
     color: rgb(255, 255, 255);
   }
   
+
+  .progress-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+    border-radius: 0 0 20px 20px;
+    margin-bottom: 20px;
+    margin-top: 40px; // Elimina cualquier margen superior que pueda estar creando espacio extra
+    padding-top: 0px;
+  }
+  
+  .date {
+    text-align: center;
+    color: #fcfcfc;
+  }
+
+  #tittle-wrapper{
+    display: flex;
+    align-items: center;
+    margin-top: 20px;
+    font-weight: bold;
+  }
+
+
+  .weekly-chart {
+    text-align: center;
+    padding: 16px;
+
+    
+    h3 {
+      color: #666;
+      margin-bottom: 0px;
+    }
+  
+    .chart-wrapper {
+      display: flex;
+      height: 250px;
+      margin-top: 20px;
+    }
+  
+    .y-axis {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-right: 10px;
+      font-size: 12px;
+      color: #666;
+    }
+  
+    .chart {
+      display: flex;
+      justify-content: space-around;
+      align-items: flex-end; // Esto se mantiene para que las barras crezcan desde abajo
+      flex-grow: 1;
+      border-bottom: 1px solid #ddd;
+      border-left: 1px solid #ddd;
+      padding-left: 10px;
+      position: relative;
+    }
+  
+    .bar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end; // Asegura que el contenido comience desde abajo
+      width: 30px;
+      height: 100%;
+    }
+  
+    .bar {
+      width: 20px;
+      background: #D0B0D9;
+      border-radius: 4px 4px 0 0;
+      transition: height 0.3s ease;
+      // No necesita posición absoluta
+    }
+  
+    .day-info {
+      position: absolute;
+      bottom: -30px; // Coloca las etiquetas debajo del eje x
+      width: 100%;
+      text-align: center;
+    }
+  
+    .day-label {
+      display: block;
+      font-size: 12px;
+    }
+  
+    .day-count {
+      display: block;
+      font-size: 10px;
+      color: #D0B0D9;
+    }
+  }

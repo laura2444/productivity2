@@ -1,4 +1,28 @@
 <div class="progress-container">
-  <canvas #chartCanvas></canvas>
-  <p>Progreso: {{ progress.toFixed(0) }}%</p>
+  <svg class="progress-ring" width="180" height="180">
+    <circle
+      class="progress-ring__circle-bg"
+      stroke="#443673"
+      stroke-width="12"
+      fill="transparent"
+      r="67.5"
+      cx="90"
+      cy="90"
+    />
+    <circle
+      class="progress-ring__circle"
+      stroke="#D0B0D9"  
+      stroke-width="12"
+      stroke-linecap="round"
+      [style.stroke-dashoffset]="strokeDashoffset"
+      fill="transparent"
+      r="67.5"
+      cx="90"
+      cy="90"
+    />
+  </svg>
+  <div class="progress-text">
+    <span class="progress-percent">{{ progress }}%</span>
+    <span class="progress-count">{{ completed }}/{{ total }}</span>
+  </div>
 </div>

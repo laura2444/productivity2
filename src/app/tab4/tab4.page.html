@@ -16,7 +16,36 @@
 
 <ion-content [fullscreen]="true">
 
-  <app-progress-chart></app-progress-chart>
+
+  <div class="weekly-chart">
+    <h3>Estadísticas semanales</h3>
+    
+    <!-- Gráfica -->
+    <div class="chart-wrapper">
+      <div class="y-axis">
+        <span>100%</span>
+        <span>75%</span>
+        <span>50%</span>
+        <span>25%</span>
+        <span>0%</span>
+      </div>
+
+      <div class="chart">
+        <div class="bar-container" *ngFor="let day of weekData">  <!-- itera sobre weekData y crea una barra por cada dia de la semana-->
+          <div class="bar" [style.height]="getPercentage(day.completed, day.total) + '%'"></div> <!-- itera sobre getPercentage pasandole los parametros de dias completados y total y esto lo toma como la altura dinamica de cada barra-->
+          <div class="day-info">
+            <span class="day-label">{{ day.label }}</span> <!--imprime el nombre del dia-->
+            <span class="day-count">{{ day.completed }}/{{ day.total }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="progress-wrapper" >
+    <app-progress-chart [completed]="16" [total]="20"></app-progress-chart>
+    <h1 id="tittle-wrapper">Ve a tu propio ritmo :)</h1>
+  </div>
 
 
   <h3 class="date">Hoy, {{ today | date: 'MMM d'}}</h3>
