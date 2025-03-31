@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Detalles de la Tarea</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="closeModal()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-content>
+      <ion-item>
+        <ion-label position="floating">Título</ion-label>
+        <ion-input [(ngModel)]="task.title"></ion-input>
+      </ion-item>
+
+      <!-- Selector de Fecha -->
+      <ion-item button id="open-date-picker">
+        <ion-label>Fecha: {{ formattedDate || task.date || 'Seleccionar' }}</ion-label>
+      </ion-item>
+      <ion-popover trigger="open-date-picker">
+        <ng-template>
+          <ion-datetime [(ngModel)]="task.date" (ionChange)="updateFormattedDate()" presentation="date"></ion-datetime>
+        </ng-template>
+      </ion-popover>
+
+
+      <!-- Selector de Hora -->
+      <ion-item button id="open-time-picker">
+        <ion-label>Hora: {{ formattedTime || task.time || 'Seleccionar' }}</ion-label>
+      </ion-item>
+      <ion-popover trigger="open-time-picker">
+        <ng-template>
+          <ion-datetime [(ngModel)]="task.time" (ionChange)="updateFormattedTime()" presentation="time"></ion-datetime>
+        </ng-template>
+      </ion-popover>
+
+
+      <ion-item>
+        <ion-label>Etiqueta</ion-label>
+        <ion-select [(ngModel)]="task.label">
+          <ion-select-option value="Trabajo">Trabajo</ion-select-option>
+          <ion-select-option value="Personal">Personal</ion-select-option>
+          <ion-select-option value="Otro">Otro</ion-select-option>
+        </ion-select>
+      </ion-item>
+      
+
+      <ion-item>
+        <ion-label position="floating">Descripción</ion-label>
+        <ion-textarea [(ngModel)]="task.description"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>Completada</ion-label>
+        <ion-checkbox [(ngModel)]="task.completed"></ion-checkbox>
+      </ion-item>
+
+      <ion-button expand="full" color="secondary" shape="round" (click)="updateTask()">Guardar Cambios</ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
