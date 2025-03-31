@@ -1,17 +1,28 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+    <ion-title>Gestión de Tareas</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding">
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <!-- este es el boton -->
+  <ion-button expand="full" (click)="openAddTaskModal()">Crear Nueva Tarea</ion-button>
+
+  <ion-list>
+    <!-- Aqui esta como se muestra la lista (componente) de tareas y tambien abre el details de la tarea para ediarla  -->
+    <ion-item *ngFor="let task of tasks$ | async">
+      <ion-label (click)="openTaskDetails(task)">
+        <h2 [class.completed]="task.completed">{{ task.title }}</h2>
+      </ion-label>
+      <ion-checkbox slot="start" [checked]="task.completed" (ionChange)="toggleTask(task.id)"></ion-checkbox>
+      <ion-button fill="clear" (click)="openTaskDetails(task)">
+        <ion-icon name="create"></ion-icon>  <!-- Ícono de edición -->
+      </ion-button>
+      <ion-button fill="clear" color="danger" (click)="removeTask(task.id)">
+        <ion-icon name="trash"></ion-icon>
+      </ion-button>
+    </ion-item>
+
+  </ion-list>
 </ion-content>
