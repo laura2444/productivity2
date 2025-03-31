@@ -1,13 +1,56 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>tab5</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      Racha Axolot
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">tab5</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <div>
+    <ion-img src="../../assets/ajolote.jpeg"></ion-img>
+  </div>
+
+  <h3>Tarea Diaria Completada</h3>
+
+  <!-- Tabla de racha -->
+  <ion-grid [fixed]="true">
+    <!-- Dias de la semana -->
+    <ion-row>
+      <ion-col>L</ion-col>
+      <ion-col>M</ion-col>
+      <ion-col>MI</ion-col>
+      <ion-col>J</ion-col>
+      <ion-col>V</ion-col>
+      <ion-col>S</ion-col>
+      <ion-col>D</ion-col>
+    </ion-row>
+    <!-- Checks -->
+    <ion-row id="checkRow">
+      <ion-col>
+        <ion-icon name="checkbox-outline"></ion-icon>
+      </ion-col>
+      <ion-col>
+        <ion-icon name="checkbox-outline"></ion-icon>
+      </ion-col>
+      <ion-col>
+        <ion-icon name="checkbox-outline"></ion-icon>
+      </ion-col>
+      <ion-col>
+        <ion-icon name="checkbox-outline"></ion-icon>
+      </ion-col>
+      <ion-col>
+        <ion-icon name="checkbox-outline"></ion-icon>
+      </ion-col>
+      <ion-col>
+        <ion-icon name="checkbox-outline"></ion-icon>
+      </ion-col>
+      <ion-col>
+        <ion-icon name="checkbox-outline"></ion-icon>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
 </ion-content>
