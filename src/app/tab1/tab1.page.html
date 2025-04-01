@@ -11,6 +11,7 @@
     </div>
   </ion-toolbar>
   <ion-searchbar [animated]="true" placeholder="Buscar tarea..." mode="ios"></ion-searchbar>
+  <ion-button class="button-subtarea" [routerLink]="['/tabs/tab3']">Subtareas</ion-button>
 </ion-header>
 
 <ion-content [fullscreen]="true">
@@ -28,7 +29,7 @@
             <span [ngClass]="{ 'task-in-progress': !task.completed, 'task-completed': task.completed }">
               {{ task.completed ? 'Completada' : 'En progreso' }}
             </span>
-            <ion-button class="button-subtarea" [routerLink]="['/tabs/tab3']">Subtareas</ion-button>
+            
           </ion-card-content>
         </div>
       </div>
