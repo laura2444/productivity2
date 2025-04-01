@@ -1,16 +1,16 @@
 <ion-header>
-  <ion-toolbar color="primary">
-    <ion-title>Crear Nueva Tarea</ion-title>
+  <ion-toolbar>
     <ion-buttons slot="start">
       <ion-button (click)="closeModal()">
         <ion-icon name="close"></ion-icon>
       </ion-button>
     </ion-buttons>
+    <ion-title>Crear Nueva Tarea</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content class="ion-padding">
-  <ion-card>
+  <ion-card class="task-card">
     <ion-card-content>
       <ion-item>
         <ion-label position="floating">Título</ion-label>
@@ -51,7 +51,7 @@
         <ion-textarea [(ngModel)]="newTask.description"></ion-textarea>
       </ion-item>
 
-      <ion-button expand="full" color="secondary" shape="round" (click)="addTask()">Crear Tarea</ion-button>
+      <ion-button expand="full" class="btn-crear" (click)="addTask()">Crear Tarea</ion-button>
     </ion-card-content>
   </ion-card>
 </ion-content>

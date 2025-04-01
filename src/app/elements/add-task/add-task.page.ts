@@ -3,6 +3,8 @@ import { ModalController, AlertController } from '@ionic/angular';
 import { TaskService } from 'src/services/task-service.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { addIcons } from 'ionicons';
+import {close} from 'ionicons/icons';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, 
   IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, IonList, 
@@ -37,7 +39,7 @@ export class AddTaskPage {
     private taskService: TaskService, 
     private modalCtrl: ModalController, 
     private alertCtrl: AlertController
-  ) {}
+  ) {addIcons({close}); }
 
   async addTask() {
     if (!this.newTask.title.trim()) {
