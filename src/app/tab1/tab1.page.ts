@@ -11,7 +11,7 @@ import { CommonModule, DatePipe, NgFor } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
 import { AddTaskPage } from '../elements/add-task/add-task.page';
-import { TaskDetailsPage } from '../elements/task-details/task-details.page'; // ✅ Importar TaskDetails
+import { TaskDetailsPage } from '../elements/task-details/task-details.page';
 
 @Component({
   selector: 'app-tab1',

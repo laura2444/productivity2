@@ -20,9 +20,9 @@ export class TaskService {
     this._tasks$.next(savedTasks);
   }
 
-  async addTask(task: { id: number; title: string; completed: boolean }) {
+  async addTask(task: { id: number; title: string; completed: boolean; subtasks?: any[] }) {
     const currentTasks = this._tasks$.getValue();
-    const updatedTasks = [...currentTasks, task];
+    const updatedTasks = [...currentTasks, { ...task, subtasks: task.subtasks || [] }];
     this._tasks$.next(updatedTasks);
     await this._storage?.set('tasks', updatedTasks);
   }
@@ -50,5 +50,21 @@ export class TaskService {
       await this._storage?.set('tasks', tasks);
     }
   }
-  
+
+  async addSubtasks(taskId: number, subtasks: { id: number; title: string; completed: boolean }[]) {
+    const tasks = this._tasks$.getValue();
+    const index = tasks.findIndex(task => task.id === taskId);
+    if (index !== -1) {
+      tasks[index].subtasks = [...(tasks[index].subtasks || []), ...subtasks];
+      this._tasks$.next(tasks);
+      await this._storage?.set('tasks', tasks);
+    }
+  }
+
+
+  getSubtasks(taskId: number) {
+    const tasks = this._tasks$.getValue();
+    const task = tasks.find(task => task.id === taskId);
+    return task ? task.subtasks || [] : [];
+  }
 }
