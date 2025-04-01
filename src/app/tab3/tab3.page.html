@@ -1,38 +1,41 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
+  <ion-toolbar class="header-container">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
     </ion-buttons>
-    <ion-title>
-      Subdividir Tarea
-    </ion-title>
+    <ion-title class="custom-title">Subdividir tarea</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Subdividir Tarea</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <ion-list>
-    <ion-item>
-      <ion-select label="Tarea" label-placement="floating" (ionChange)="tareaSelect($event)">
-        <!-- Insertar aqui las tareas que existen -->
-        <ion-select-option value="Hacer cosas">
-          <!-- Tarea de prueba -->
-          Hacer cosas
-        </ion-select-option>
+<ion-content [fullscreen]="true" class="custom-content">
+  <ion-list class="task-select-container">
+    <ion-item class="task-select-item">
+      <ion-select label="Selecciona una tarea" label-placement="floating" (ionChange)="tareaSelect($event)" class="task-dropdown">
+        <ion-select-option *ngFor="let task of tasks" [value]="task.id">{{ task.title }}</ion-select-option>
       </ion-select>
-      <ion-icon name="add-circle-outline" slot="end" (click)="crearTareaPage()"></ion-icon>
+      <ion-button fill="clear" class="add-task-button" (click)="crearTareaPage()">
+        <ion-icon name="add-circle-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
-  
-  <ion-item>
-    <h5>Sub-Tareas</h5>
-    <ion-button shape="round" slot="end">Subdividir</ion-button>
+
+  <ion-item class="subtask-header">
+    <h5>Sub-Tareas ({{ subtasks.length }})</h5>
+    <ion-button class="subdivide-button" (click)="subdividirTarea()">Subdividir tarea</ion-button>
   </ion-item>
 
-  <!-- Falta la lista de las sub-tareas -->
+  <ion-list class="subtask-list">
+    <ion-card *ngFor="let subtask of subtasks" class="subtask-card">
+      <div class="subtask-content">
+        <div class="subtask-icon"></div>
+        <div class="subtask-text">
+          <ion-card-title>{{ subtask.title }}</ion-card-title>
+          <ion-card-subtitle>40 min - [En progreso]</ion-card-subtitle>
+        </div>
+        <ion-button fill="clear" class="play-button">
+          <ion-icon name="play-circle"></ion-icon>
+        </ion-button>
+      </div>
+    </ion-card>
+  </ion-list>
 </ion-content>

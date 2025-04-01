@@ -1,67 +1,153 @@
-/* Estilos similares a Tab 1 */
 .header-container {
+    background: #211b3e;
+    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 0 0 20px 20px;
     display: flex;
-    padding: 10px 10px;
-    background-color: #211C40;
-}
-
-.custom-title {
-    text-align: left;
-    font-size: 25px;
-}
-
-.fab-header {
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
     position: relative;
-}
-
-.small-button {
-    --background: #F2E4D8;
-    --color: black;
-    width: 43px;
-    height: 43px;
-}
-
-.custom-list {
-    width: 100%;
-}
-
-.custom-item {
-    --background: #D0B0D9;
-    border-radius: 10px;
-    margin: 10px 0;
-}
-
-.container-card {
-    margin: 30px 20px;
-    background-color: #D0B0D9;
-    border-radius: 18px;
-    color: black;
-}
-
-.card {
-    padding: 10px;
-    background-color: #D0B0D9;
-}
-
-.card-content {
+  }
+  
+  .custom-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .fab-header {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+  }
+  
+  .small-button {
+    width: 40px;
+    height: 40px;
+    --background: #574b90;
+    --color: white;
+  }
+  
+  .custom-content {
+    --background: #221c40;
+    background-color: #221c40;
+    color: white;
+    padding: 20px;
+  }
+  
+  .task-select-container {
+    margin: 20px 0;
+  }
+  
+  .task-select-item {
     display: flex;
     align-items: center;
-    background-color: #D0B0D9;
-}
-
-.color-box {
-    width: 77px;
-    height: 95px;
-    background-color: #F2E4D8;
-    border-radius: 8px;
-}
-
-
-.button-subtarea {
-    width: auto;
-    height: auto;
+    border-radius: 20px;
+    padding: 12px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background: #2e254d;
+  }
+  
+  .task-dropdown {
+    flex-grow: 1;
+    font-weight: bold;
+    border-radius: 15px;
+    padding: 5px;
+    background: #443673;
+    color: white;
+  }
+  
+  .subtask-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .subdivide-button {
+    background: #574b90;
+    color: white;
+    border-radius: 15px;
+    font-weight: bold;
+    padding: 5px 15px;
+  }
+  
+  .subtask-list {
+    margin-top: 15px;
+    background: #211b3e;
+  }
+  
+  .subtask-card {
+    background: #b89ccf;
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .subtask-content {
+    display: flex;
+    align-items: center;
+  }
+  
+  .subtask-icon {
+    width: 45px;
+    height: 45px;
+    background: #f2e4d8;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: #221c40;
+  }
+  
+  .subtask-text {
+    flex-grow: 1;
+    padding-left: 12px;
+  }
+  
+  .play-button {
+    color: white;
+    font-size: 22px;
+    background: transparent;
+    border-radius: 50%;
+  }
+  
+  .bottom-nav {
+    background: #443673;
+    border-radius: 20px 20px 0 0;
+    padding: 10px;
+    box-shadow: 0px -3px 10px rgba(0, 0, 0, 0.2);
+  }
+  
+  .card-text {
+    flex-grow: 1;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .button-subtarea {
     font-size: 12px;
     --color: white;
-    --background: #443673;
+    --background: #574b90;
     --border-radius: 12px;
-}
+    padding: 5px 10px;
+  }
+  
+  .list-md {
+    background: none !important;
+    background-color: transparent !important;
+  }
+  
+  .item-native {
+    background: none !important;
+    background-color: transparent !important;
+  }
+  
+  ion-item {
+    --background: transparent !important;
+    background: none !important;
+  }
