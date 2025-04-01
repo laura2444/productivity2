@@ -10,26 +10,29 @@
       </ion-fab>
     </div>
   </ion-toolbar>
-
   <ion-searchbar [animated]="true" placeholder="Buscar tarea..." mode="ios"></ion-searchbar>
   <ion-button class="button-subtarea" [routerLink]="['/tabs/tab3']">Subtareas</ion-button>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="custom-content">
-  <ion-list class="task-list">
-    <ion-card class="task-card" *ngFor="let task of tasks" (click)="openTaskDetails(task)">
-      <div class="task-content">
-        <div class="task-icon"></div>
+<ion-content [fullscreen]="true">
+  <ion-card class="container-card" *ngFor="let task of tasks"> 
+    <div class="card">
+      <div class="card-content">
+        <ion-thumbnail slot="start" class="color-box"></ion-thumbnail>
 
-        <div class="task-text">
-          <ion-card-title>{{ task.title }}</ion-card-title>
-          <ion-card-subtitle>{{ task.time }} - {{ task.date }}</ion-card-subtitle>
+        <div class="card-text">
+          <ion-card-header  (click)="openTaskDetails(task)">
+            <ion-card-title>{{ task.title }}</ion-card-title>
+            <ion-card-subtitle>{{ task.time }} - {{ task.date }}</ion-card-subtitle>
+          </ion-card-header>
+          <ion-card-content>
+            <span [ngClass]="{ 'task-in-progress': !task.completed, 'task-completed': task.completed }">
+              {{ task.completed ? 'Completada' : 'En progreso' }}
+            </span>
+            
+          </ion-card-content>
         </div>
-
-        <span class="task-status" [ngClass]="{ 'task-in-progress': !task.completed, 'task-completed': task.completed }">
-          {{ task.completed ? 'Completada' : 'En progreso' }}
-        </span>
       </div>
-    </ion-card>
-  </ion-list>
+    </div>
+  </ion-card>
 </ion-content>

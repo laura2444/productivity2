@@ -19,15 +19,17 @@
     </ion-item>
   </ion-list>
 
-  <ion-item class="subtask-header">
+  <div class="subtask-header">
     <h5>Sub-Tareas ({{ subtasks.length }})</h5>
     <ion-button class="subdivide-button" (click)="subdividirTarea()">Subdividir tarea</ion-button>
-  </ion-item>
+  </div>
 
   <ion-list class="subtask-list">
     <ion-card *ngFor="let subtask of subtasks" class="subtask-card">
       <div class="subtask-content">
-        <div class="subtask-icon"></div>
+        <div class="subtask-icon">
+          <ion-icon name="clipboard-outline"></ion-icon>
+        </div>
         <div class="subtask-text">
           <ion-card-title>{{ subtask.title }}</ion-card-title>
           <ion-card-subtitle>40 min - [En progreso]</ion-card-subtitle>

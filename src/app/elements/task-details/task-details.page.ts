@@ -1,13 +1,12 @@
 import { Component, Input } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { TaskService } from 'src/services/task-service.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, 
   IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, IonList, 
-  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonCheckbox 
-} from '@ionic/angular/standalone';
+  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonCheckbox, IonCardSubtitle } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
 import { close, trash } from 'ionicons/icons';
 
@@ -16,7 +15,7 @@ import { close, trash } from 'ionicons/icons';
   templateUrl: 'task-details.page.html',
   styleUrls: ['task-details.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonCardSubtitle, 
     IonPopover, IonCard, IonCardContent, IonButtons, IonIcon, IonList, 
     CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, 
     IonContent, IonInput, IonButton, IonItem, IonLabel, IonDatetime, 
@@ -28,16 +27,26 @@ export class TaskDetailsPage {
   formattedDate: string = '';
   formattedTime: string = '';
 
+  tasks: any[] = [];
+
   constructor(
     private taskService: TaskService,
     private modalCtrl: ModalController,
-    private alertCtrl: AlertController
+    private alertCtrl: AlertController,
+    private datePipe: DatePipe
   ) { addIcons({close,trash})}
 
   
   ngOnInit() {
     this.updateFormattedDate();
     this.updateFormattedTime();
+    this.taskService.tasks$.subscribe(tasks => {
+      this.tasks = tasks.map(task => ({
+        ...task,
+        date: this.datePipe.transform(task.date, 'dd/MM/yyyy'), // ✅ Sigue formateando la fecha
+        time: this.formatTime(task.time) // Nueva función para formatear la hora sin errores
+      }));
+    });
   }
 
   async updateTask() {
@@ -91,6 +100,27 @@ export class TaskDetailsPage {
       this.formattedTime = new Date(this.task.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
   }
+
+  formatTime(time: string): string {
+    if (!time) return ''; // Evita errores si la hora es nula o indefinida
+  
+    const timeParts = time.match(/(\d+):(\d+)\s?(AM|PM)?/); 
+    if (!timeParts) return time; // Si el formato es inválido, devuelve el original
+  
+    let hours = parseInt(timeParts[1], 10);
+    const minutes = timeParts[2];
+    const ampm = timeParts[3] || ''; // AM/PM (si está presente)
+  
+    // Conversión de formato 12h a 24h si es necesario
+    if (ampm.toUpperCase() === 'PM' && hours < 12) {
+      hours += 12;
+    } else if (ampm.toUpperCase() === 'AM' && hours === 12) {
+      hours = 0;
+    }
+  
+    return `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+  }
+  
 
   async confirmDeleteTask() {
     const alert = await this.alertCtrl.create({

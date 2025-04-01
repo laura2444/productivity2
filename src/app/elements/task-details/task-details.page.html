@@ -19,7 +19,7 @@
 
       <!-- Selector de Fecha -->
       <ion-item button id="open-date-picker">
-        <ion-label>Fecha: {{ formattedDate || task.date || 'Seleccionar' }}</ion-label>
+        <ion-label>Fecha: {{ task.date || 'Seleccionar' }}</ion-label>
       </ion-item>
       <ion-popover trigger="open-date-picker">
         <ng-template>
@@ -29,7 +29,7 @@
 
       <!-- Selector de Hora -->
       <ion-item button id="open-time-picker">
-        <ion-label>Hora: {{ formattedTime || task.time || 'Seleccionar' }}</ion-label>
+        <ion-label>Hora: {{ task.time || 'Seleccionar' }}</ion-label>
       </ion-item>
       <ion-popover trigger="open-time-picker">
         <ng-template>

@@ -5,7 +5,7 @@ import { RouterModule } from '@angular/router';
 import {
   IonFab, IonFabButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent, 
   IonSearchbar, IonButton, IonCard, IonCardContent, IonCardHeader, 
-  IonCardSubtitle, IonCardTitle, IonThumbnail, IonList, IonItem } from '@ionic/angular/standalone';
+  IonCardSubtitle, IonCardTitle, IonThumbnail, IonList, IonItem, IonButtons, IonBackButton } from '@ionic/angular/standalone';
 import { CommonModule, DatePipe, NgFor } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
@@ -17,7 +17,7 @@ import { TaskDetailsPage } from '../elements/task-details/task-details.page';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   standalone: true,
-  imports: [IonItem, IonList, 
+  imports: [IonBackButton, IonButtons, IonItem, IonList, 
     CommonModule, NgFor, DatePipe, 
     IonButton, IonHeader, IonToolbar, IonTitle, IonContent, 
     IonSearchbar, IonFab, IonFabButton, IonIcon, RouterModule, 
@@ -42,7 +42,7 @@ export class Tab1Page implements OnInit {
       this.tasks = tasks.map(task => ({
         ...task,
         date: this.datePipe.transform(task.date, 'dd/MM/yyyy'), // ✅ Sigue formateando la fecha
-        time: this.formatTime(task.time) // ✅ Nueva función para formatear la hora sin errores
+        time: this.formatTime(task.time) // Nueva función para formatear la hora sin errores
       }));
     });
   }
