@@ -8,6 +8,8 @@ import {
   IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, IonList, 
   IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonCheckbox 
 } from '@ionic/angular/standalone';
+import { addIcons } from 'ionicons';
+import { close } from 'ionicons/icons';
 
 @Component({
   selector: 'app-task-details',
@@ -30,7 +32,7 @@ export class TaskDetailsPage {
     private taskService: TaskService,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController
-  ) {}
+  ) { addIcons({close})}
 
   
   ngOnInit() {

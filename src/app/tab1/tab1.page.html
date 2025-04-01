@@ -14,13 +14,13 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-card class="container-card" *ngFor="let task of tasks" (click)="openTaskDetails(task)"> 
+  <ion-card class="container-card" *ngFor="let task of tasks"> 
     <div class="card">
       <div class="card-content">
         <ion-thumbnail slot="start" class="color-box"></ion-thumbnail>
 
         <div class="card-text">
-          <ion-card-header>
+          <ion-card-header  (click)="openTaskDetails(task)">
             <ion-card-title>{{ task.title }}</ion-card-title>
             <ion-card-subtitle>{{ task.time }} - {{ task.date }}</ion-card-subtitle>
           </ion-card-header>
