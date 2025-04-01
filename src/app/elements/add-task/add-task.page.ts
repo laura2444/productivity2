@@ -8,14 +8,14 @@ import {close} from 'ionicons/icons';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, 
   IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, IonList, 
-  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover } from '@ionic/angular/standalone';
+  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonSearchbar, IonFab, IonFabButton } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-add-task',
   templateUrl: 'add-task.page.html',
   styleUrls: ['add-task.page.scss'],
   standalone: true,
-  imports: [IonPopover, IonCardContent, IonCard, 
+  imports: [IonFabButton, IonFab, IonSearchbar, IonPopover, IonCardContent, IonCard, 
     IonButtons, IonIcon, IonList, CommonModule, FormsModule, IonHeader, 
     IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, IonLabel, 
     IonDatetime, IonSelect, IonSelectOption, IonTextarea

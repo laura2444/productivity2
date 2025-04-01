@@ -9,7 +9,7 @@ import {
   IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonCheckbox 
 } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close } from 'ionicons/icons';
+import { close, trash } from 'ionicons/icons';
 
 @Component({
   selector: 'app-task-details',
@@ -32,7 +32,7 @@ export class TaskDetailsPage {
     private taskService: TaskService,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController
-  ) { addIcons({close})}
+  ) { addIcons({close,trash})}
 
   
   ngOnInit() {
@@ -91,4 +91,28 @@ export class TaskDetailsPage {
       this.formattedTime = new Date(this.task.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
   }
+
+  async confirmDeleteTask() {
+    const alert = await this.alertCtrl.create({
+      header: 'Eliminar Tarea',
+      message: '¿Estás seguro de que deseas eliminar esta tarea?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          handler: () => this.deleteTask()
+        }
+      ]
+    });
+    await alert.present();
+  }
+  
+  async deleteTask() {
+    await this.taskService.removeTask(this.task.id);
+    this.modalCtrl.dismiss(); // Cierra el modal después de eliminar la tarea
+  }
+  
 }

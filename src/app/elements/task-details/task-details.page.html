@@ -57,6 +57,10 @@
       </ion-item>
 
       <ion-button expand="full" class="btn-guardar" (click)="updateTask()">Guardar Cambios</ion-button>
+      <ion-button expand="full" color="danger" (click)="confirmDeleteTask()">
+        <ion-icon slot="start" name="trash"></ion-icon> Eliminar Tarea
+      </ion-button>
+      
     </ion-card-content>
   </ion-card>
 </ion-content>

@@ -5,8 +5,7 @@ import { RouterModule } from '@angular/router';
 import {
   IonFab, IonFabButton, IonIcon, IonHeader, IonToolbar, IonTitle, IonContent, 
   IonSearchbar, IonButton, IonCard, IonCardContent, IonCardHeader, 
-  IonCardSubtitle, IonCardTitle, IonThumbnail
-} from '@ionic/angular/standalone';
+  IonCardSubtitle, IonCardTitle, IonThumbnail, IonList, IonItem } from '@ionic/angular/standalone';
 import { CommonModule, DatePipe, NgFor } from '@angular/common';
 import { addIcons } from 'ionicons';
 import { add } from 'ionicons/icons';
@@ -18,7 +17,7 @@ import { TaskDetailsPage } from '../elements/task-details/task-details.page';
   templateUrl: 'tab1.page.html',
   styleUrls: ['tab1.page.scss'],
   standalone: true,
-  imports: [
+  imports: [IonItem, IonList, 
     CommonModule, NgFor, DatePipe, 
     IonButton, IonHeader, IonToolbar, IonTitle, IonContent, 
     IonSearchbar, IonFab, IonFabButton, IonIcon, RouterModule, 
