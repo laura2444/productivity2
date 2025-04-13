@@ -1,38 +1,81 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <div class="header-container">
-      <ion-title class="custom-title">Todas las tareas</ion-title>
-
-      <ion-fab class="fab-header">
-        <ion-fab-button class="small-button" (click)="openAddTaskModal()">
-          <ion-icon name="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
+<ion-header [translucent]="true" class="custom-header">
+  <ion-toolbar class="toolbar-custom">
+    <div class="header-content">
+      <div class="title-container">
+        <ion-title class="custom-title">
+          <span class="title-text">Mis Tareas</span>
+          <span class="tasks-count" *ngIf="filteredTasks.length > 0">
+            {{filteredTasks.length}} {{filteredTasks.length === 1 ? 'tarea' : 'tareas'}}
+          </span>
+        </ion-title>
+      </div>
+      <div class="search-container">
+        <ion-searchbar 
+          [animated]="true" 
+          placeholder="Buscar tarea..." 
+          mode="ios"
+          class="custom-searchbar"
+          [(ngModel)]="searchTerm"
+          (ionChange)="applyFilters()"
+          debounce="300">
+        </ion-searchbar>
+      </div>
     </div>
   </ion-toolbar>
-  <ion-searchbar [animated]="true" placeholder="Buscar tarea..." mode="ios"></ion-searchbar>
-  <ion-button class="button-subtarea" [routerLink]="['/tabs/tab3']">Subtareas</ion-button>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-card class="container-card" *ngFor="let task of tasks"> 
-    <div class="card">
-      <div class="card-content">
-        <ion-thumbnail slot="start" class="color-box"></ion-thumbnail>
+  <!-- Filtros por estado -->
+  <ion-segment scrollable [(ngModel)]="filterStatus" class="custom-segment" (ionChange)="applyFilters()">
+    <ion-segment-button value="all">
+      <ion-label>Todas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="progress">
+      <ion-label>En Progreso</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="completed">
+      <ion-label>Completadas</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-        <div class="card-text">
-          <ion-card-header  (click)="openTaskDetails(task)">
-            <ion-card-title>{{ task.title }}</ion-card-title>
-            <ion-card-subtitle>{{ task.time }} - {{ task.date }}</ion-card-subtitle>
-          </ion-card-header>
-          <ion-card-content>
-            <span [ngClass]="{ 'task-in-progress': !task.completed, 'task-completed': task.completed }">
-              {{ task.completed ? 'Completada' : 'En progreso' }}
-            </span>
-            
-          </ion-card-content>
-        </div>
+  <!-- Lista de tareas filtradas -->
+  <!-- Dentro del ion-content -->
+<div *ngFor="let task of filteredTasks; trackBy: trackById" class="container-card" [ngClass]="{'completed-card': task.completed}">
+
+    <ion-thumbnail class="color-box" [style.background-color]="task.color || '#D0B0D9'"></ion-thumbnail>
+    <div class="card-text" (click)="openTaskDetails(task)">
+      <div class="card-header">
+        <ion-card-title>{{ task.title }}</ion-card-title>
+        <ion-badge [color]="task.completed ? 'success' : 'tertiary'">
+          {{ task.completed ? 'Completada' : 'En progreso' }}
+        </ion-badge>
+      </div>
+      <ion-card-subtitle>
+        <ion-icon name="time-outline"></ion-icon>
+        {{ task.time }} 
+        <ion-icon name="calendar-outline" style="margin-left: 8px"></ion-icon>
+        {{ task.date }}
+      </ion-card-subtitle>
+      <div class="card-footer" *ngIf="task.tags">
+        <ion-chip *ngFor="let tag of task.tags" outline="true">
+          <ion-label>{{tag}}</ion-label>
+        </ion-chip>
       </div>
     </div>
-  </ion-card>
+    <ion-button fill="clear" class="task-options" (click)="showTaskOptions(task)">
+      <ion-icon name="ellipsis-vertical" slot="icon-only"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Mensaje cuando no hay resultados -->
+  <div class="empty-state" *ngIf="filteredTasks.length === 0">
+    <ion-icon name="search-outline"></ion-icon>
+    <p>No se encontraron tareas</p>
+  </div>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openAddTaskModal()" class="fab-button">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

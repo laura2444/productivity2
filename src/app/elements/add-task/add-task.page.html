@@ -1,57 +1,88 @@
-<ion-header>
-  <ion-toolbar>
+<ion-header class="custom-header">
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
-        <ion-icon name="close"></ion-icon>
+      <ion-button (click)="closeModal()" class="close-button">
+        <ion-icon name="close" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Crear Nueva Tarea</ion-title>
+    <ion-title class="custom-title">
+      <span class="title-text">Crear Nueva Tarea</span>
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding custom-content">
   <ion-card class="task-card">
     <ion-card-content>
-      <ion-item>
-        <ion-label position="floating">Título</ion-label>
-        <ion-input [(ngModel)]="newTask.title" required></ion-input>
+      <!-- Campo de título -->
+      <ion-item lines="none" class="custom-input">
+        <ion-label position="floating" class="input-label">Título</ion-label>
+        <ion-input [(ngModel)]="newTask.title" required class="input-field"></ion-input>
       </ion-item>
 
       <!-- Selector de Fecha -->
-      <ion-item button id="open-date-picker">
-        <ion-label>Fecha: {{ formattedDate || 'Seleccionar' }}</ion-label>
+      <ion-item lines="none" button id="open-date-picker" class="custom-input date-time-item">
+        <ion-icon name="calendar-outline" slot="start" class="picker-icon"></ion-icon>
+        <ion-label class="input-label">Fecha</ion-label>
+        <ion-text slot="end" class="selected-value">{{ formattedDate || 'Seleccionar' }}</ion-text>
       </ion-item>
-      <ion-popover trigger="open-date-picker">
+      <ion-popover trigger="open-date-picker" class="custom-popover">
         <ng-template>
-          <ion-datetime [(ngModel)]="newTask.date" (ionChange)="updateFormattedDate()" presentation="date"></ion-datetime>
+          <ion-datetime 
+            [(ngModel)]="newTask.date" 
+            (ionChange)="updateFormattedDate()" 
+            presentation="date"
+            class="custom-datetime">
+          </ion-datetime>
         </ng-template>
       </ion-popover>
 
       <!-- Selector de Hora -->
-      <ion-item button id="open-time-picker">
-        <ion-label>Hora: {{ formattedTime || 'Seleccionar' }}</ion-label>
+      <ion-item lines="none" button id="open-time-picker" class="custom-input date-time-item">
+        <ion-icon name="time-outline" slot="start" class="picker-icon"></ion-icon>
+        <ion-label class="input-label">Hora</ion-label>
+        <ion-text slot="end" class="selected-value">{{ formattedTime || 'Seleccionar' }}</ion-text>
       </ion-item>
-      <ion-popover trigger="open-time-picker">
+      <ion-popover trigger="open-time-picker" class="custom-popover">
         <ng-template>
-          <ion-datetime [(ngModel)]="newTask.time" (ionChange)="updateFormattedTime()" presentation="time"></ion-datetime>
+          <ion-datetime 
+            [(ngModel)]="newTask.time" 
+            (ionChange)="updateFormattedTime()" 
+            presentation="time"
+            class="custom-datetime">
+          </ion-datetime>
         </ng-template>
       </ion-popover>
 
-      <ion-item>
-        <ion-label>Etiqueta</ion-label>
-        <ion-select [(ngModel)]="newTask.label">
+      <!-- Selector de Estado -->
+      <ion-item lines="none" class="custom-input">
+        <ion-icon name="flag-outline" slot="start" class="picker-icon"></ion-icon>
+        <ion-label class="input-label">Estado</ion-label>
+        <ion-select 
+          [(ngModel)]="newTask.label" 
+          interface="popover" 
+          class="custom-select">
           <ion-select-option value="Trabajo">Sin Empezar</ion-select-option>
           <ion-select-option value="Progreso">En Progreso</ion-select-option>
           <ion-select-option value="Terminada">Terminada</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <ion-item>
-        <ion-label position="floating">Descripción</ion-label>
-        <ion-textarea [(ngModel)]="newTask.description"></ion-textarea>
+      <!-- Campo de Descripción -->
+      <ion-item lines="none" class="custom-input">
+        <ion-label position="floating" class="input-label">Descripción</ion-label>
+        <ion-textarea 
+          [(ngModel)]="newTask.description" 
+          rows="4"
+          class="input-field">
+        </ion-textarea>
       </ion-item>
 
-      <ion-button expand="full" class="btn-crear" (click)="addTask()">Crear Tarea</ion-button>
+      <!-- Botón de Crear -->
+      <ion-button expand="block" class="btn-crear" (click)="addTask()">
+        <ion-icon name="checkmark-circle" slot="start"></ion-icon>
+        Crear Tarea
+      </ion-button>
     </ion-card-content>
   </ion-card>
 </ion-content>

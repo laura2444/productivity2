@@ -4,18 +4,18 @@ import { TaskService } from 'src/services/task-service.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import {close} from 'ionicons/icons';
+import {calendarOutline, checkmarkCircle, checkmarkOutline, close, flagOutline, timeOutline} from 'ionicons/icons';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, 
   IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, IonList, 
-  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonSearchbar, IonFab, IonFabButton } from '@ionic/angular/standalone';
+  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonSearchbar, IonFab, IonFabButton, IonText } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-add-task',
   templateUrl: 'add-task.page.html',
   styleUrls: ['add-task.page.scss'],
   standalone: true,
-  imports: [IonFabButton, IonFab, IonSearchbar, IonPopover, IonCardContent, IonCard, 
+  imports: [IonText, IonFabButton, IonFab, IonSearchbar, IonPopover, IonCardContent, IonCard, 
     IonButtons, IonIcon, IonList, CommonModule, FormsModule, IonHeader, 
     IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, IonLabel, 
     IonDatetime, IonSelect, IonSelectOption, IonTextarea
@@ -39,7 +39,7 @@ export class AddTaskPage {
     private taskService: TaskService, 
     private modalCtrl: ModalController, 
     private alertCtrl: AlertController
-  ) {addIcons({close}); }
+  ) {addIcons({close,calendarOutline,timeOutline,flagOutline,checkmarkCircle}); }
 
   async addTask() {
     if (!this.newTask.title.trim()) {

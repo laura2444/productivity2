@@ -61,10 +61,33 @@ export class TaskService {
     }
   }
 
-
   getSubtasks(taskId: number) {
     const tasks = this._tasks$.getValue();
     const task = tasks.find(task => task.id === taskId);
     return task ? task.subtasks || [] : [];
+  }
+
+  // ✅ FUNCIONES FALTANTES
+
+  async deleteTask(id: number) {
+    const updatedTasks = this._tasks$.getValue().filter(task => task.id !== id);
+    this._tasks$.next(updatedTasks);
+    await this._storage?.set('tasks', updatedTasks);
+  }
+
+  async loadTasks() {
+    const savedTasks = await this._storage?.get('tasks') || [];
+    this._tasks$.next(savedTasks);
+  }
+
+  // ✅ (OPCIONAL) Utilidades reutilizables
+
+  private async saveToStorage() {
+    await this._storage?.set('tasks', this._tasks$.getValue());
+  }
+
+  private async loadFromStorage() {
+    const savedTasks = await this._storage?.get('tasks') || [];
+    this._tasks$.next(savedTasks);
   }
 }
