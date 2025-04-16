@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { TaskService } from 'src/services/task-service.service';
 import { CommonModule, DatePipe } from '@angular/common';
@@ -6,51 +6,54 @@ import { FormsModule } from '@angular/forms';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, 
   IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, IonList, 
-  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonCheckbox, IonCardSubtitle } from '@ionic/angular/standalone';
+  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonCheckbox, 
+  IonCardSubtitle, IonChip, IonCardHeader, IonCardTitle, IonText, IonSegmentButton, IonModal } from '@ionic/angular/standalone';
 import { addIcons } from 'ionicons';
-import { close, trash } from 'ionicons/icons';
+import { arrowBack, saveOutline, trashOutline, createOutline, calendarOutline, 
+  timeOutline, pricetagOutline, documentTextOutline, checkmarkDoneOutline, 
+  documentAttachOutline, downloadOutline, pricetagsOutline, flagOutline, add, 
+  checkmark, ellipsisVertical } from 'ionicons/icons';
 
 @Component({
   selector: 'app-task-details',
   templateUrl: 'task-details.page.html',
   styleUrls: ['task-details.page.scss'],
   standalone: true,
-  imports: [IonCardSubtitle, 
+  imports: [IonModal, IonSegmentButton, IonText, 
+    IonCardTitle, IonCardHeader, IonChip, IonCardSubtitle, 
     IonPopover, IonCard, IonCardContent, IonButtons, IonIcon, IonList, 
     CommonModule, FormsModule, IonHeader, IonToolbar, IonTitle, 
     IonContent, IonInput, IonButton, IonItem, IonLabel, IonDatetime, 
     IonSelect, IonSelectOption, IonTextarea, IonCheckbox
   ]
 })
-export class TaskDetailsPage {
+export class TaskDetailsPage implements OnInit {
+getFileIcon(arg0: any) {
+throw new Error('Method not implemented.');
+}
   @Input() task: any;
   formattedDate: string = '';
   formattedTime: string = '';
-
-  tasks: any[] = [];
+  attachment1Checked: boolean = false;
+  attachment2Checked: boolean = true; // Ejemplo de adjunto marcado
+attachments: any;
 
   constructor(
     private taskService: TaskService,
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
     private datePipe: DatePipe
-  ) { addIcons({close,trash})}
+  ) { 
+    addIcons({arrowBack,checkmark,createOutline,documentTextOutline,calendarOutline,timeOutline,pricetagsOutline,pricetagOutline,flagOutline,checkmarkDoneOutline,documentAttachOutline,ellipsisVertical,add,trashOutline,saveOutline,downloadOutline});
+  }
 
-  
   ngOnInit() {
     this.updateFormattedDate();
     this.updateFormattedTime();
-    this.taskService.tasks$.subscribe(tasks => {
-      this.tasks = tasks.map(task => ({
-        ...task,
-        date: this.datePipe.transform(task.date, 'dd/MM/yyyy'), // ✅ Sigue formateando la fecha
-        time: this.formatTime(task.time) // Nueva función para formatear la hora sin errores
-      }));
-    });
   }
 
   async updateTask() {
-    if (!this.task.title.trim()) {
+    if (!this.task.title?.trim()) {
       return this.showError('El título de la tarea es obligatorio.');
     }
     if (!this.task.date) {
@@ -60,8 +63,12 @@ export class TaskDetailsPage {
       return this.showError('Debes seleccionar una hora.');
     }
 
-    await this.taskService.updateTask(this.task);
-    this.showConfirmation('Tarea actualizada correctamente.');
+    try {
+      await this.taskService.updateTask(this.task);
+      this.showConfirmation('Tarea actualizada correctamente.');
+    } catch (error) {
+      this.showError('Error al actualizar la tarea. Por favor, inténtalo de nuevo.');
+    }
   }
 
   async showConfirmation(message: string) {
@@ -91,40 +98,44 @@ export class TaskDetailsPage {
 
   updateFormattedDate() {
     if (this.task.date) {
-      this.formattedDate = new Date(this.task.date).toLocaleDateString();
+      this.formattedDate = this.datePipe.transform(this.task.date, 'dd/MM/yyyy') || '';
     }
   }
 
   updateFormattedTime() {
     if (this.task.time) {
-      this.formattedTime = new Date(this.task.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      this.formattedTime = this.formatTime(this.task.time);
     }
   }
 
   formatTime(time: string): string {
-    if (!time) return ''; // Evita errores si la hora es nula o indefinida
-  
-    const timeParts = time.match(/(\d+):(\d+)\s?(AM|PM)?/); 
-    if (!timeParts) return time; // Si el formato es inválido, devuelve el original
-  
+    if (!time) return '';
+    
+    // Si ya está en formato HH:mm
+    if (/^\d{1,2}:\d{2}$/.test(time)) {
+      return time;
+    }
+    
+    // Si tiene formato de hora con AM/PM
+    const timeParts = time.match(/(\d+):(\d+)\s?(AM|PM)?/i); 
+    if (!timeParts) return time;
+
     let hours = parseInt(timeParts[1], 10);
     const minutes = timeParts[2];
-    const ampm = timeParts[3] || ''; // AM/PM (si está presente)
-  
-    // Conversión de formato 12h a 24h si es necesario
-    if (ampm.toUpperCase() === 'PM' && hours < 12) {
+    const ampm = timeParts[3]?.toUpperCase() || '';
+
+    if (ampm === 'PM' && hours < 12) {
       hours += 12;
-    } else if (ampm.toUpperCase() === 'AM' && hours === 12) {
+    } else if (ampm === 'AM' && hours === 12) {
       hours = 0;
     }
-  
-    return `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
   }
-  
 
   async confirmDeleteTask() {
     const alert = await this.alertCtrl.create({
-      header: 'Eliminar Tarea',
+      header: 'Confirmar Eliminación',
       message: '¿Estás seguro de que deseas eliminar esta tarea?',
       buttons: [
         {
@@ -141,8 +152,11 @@ export class TaskDetailsPage {
   }
   
   async deleteTask() {
-    await this.taskService.removeTask(this.task.id);
-    this.modalCtrl.dismiss(); // Cierra el modal después de eliminar la tarea
+    try {
+      await this.taskService.removeTask(this.task.id);
+      this.modalCtrl.dismiss({ deleted: true });
+    } catch (error) {
+      this.showError('Error al eliminar la tarea. Por favor, inténtalo de nuevo.');
+    }
   }
-  
 }

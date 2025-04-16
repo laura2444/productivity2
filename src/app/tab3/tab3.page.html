@@ -1,43 +1,159 @@
-<ion-header [translucent]="true">
-  <ion-toolbar class="header-container">
+<ion-header [translucent]="true" class="custom-header">
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tabs/tab1"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/tab1" class="back-button" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title class="custom-title">Subdividir tarea</ion-title>
+    <ion-title class="custom-title">
+      <span class="title-text">Subdividir Tarea</span>
+      <span class="tasks-count" *ngIf="selectedTask && subtasks.length > 0">
+        {{ subtasks.length }} {{ subtasks.length === 1 ? 'subtarea' : 'subtareas' }}
+      </span>
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button fill="clear" class="add-task-button" (click)="crearTareaPage()">
+        <ion-icon name="add-circle" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="custom-content">
-  <ion-list class="task-select-container">
-    <ion-item class="task-select-item">
-      <ion-select label="Selecciona una tarea" label-placement="floating" (ionChange)="tareaSelect($event)" class="task-dropdown">
+  <!-- Selector de tarea principal -->
+  <div class="main-task-selector">
+    <ion-item lines="none" class="task-select-item">
+      <ion-icon name="list-outline" slot="start" class="selector-icon"></ion-icon>
+      <ion-select 
+        label="Selecciona una tarea" 
+        label-placement="floating" 
+        (ionChange)="tareaSelect($event)" 
+        class="task-dropdown"
+        interface="action-sheet"
+        [disabled]="tasks.length === 0 || isGeneratingSubtasks"
+        [value]="selectedTask?.id">
+        <ion-select-option *ngIf="tasks.length === 0" [value]="null">No hay tareas disponibles</ion-select-option>
         <ion-select-option *ngFor="let task of tasks" [value]="task.id">{{ task.title }}</ion-select-option>
       </ion-select>
-      <ion-button fill="clear" class="add-task-button" (click)="crearTareaPage()">
-        <ion-icon name="add-circle-outline"></ion-icon>
-      </ion-button>
     </ion-item>
-  </ion-list>
-
-  <div class="subtask-header">
-    <h5>Sub-Tareas ({{ subtasks.length }})</h5>
-    <ion-button class="subdivide-button" (click)="subdividirTarea()">Subdividir tarea</ion-button>
   </div>
 
-  <ion-list class="subtask-list">
-    <ion-card *ngFor="let subtask of subtasks" class="subtask-card">
-      <div class="subtask-content">
-        <div class="subtask-icon">
-          <ion-icon name="clipboard-outline"></ion-icon>
-        </div>
-        <div class="subtask-text">
-          <ion-card-title>{{ subtask.title }}</ion-card-title>
-          <ion-card-subtitle>40 min - [En progreso]</ion-card-subtitle>
-        </div>
-        <ion-button fill="clear" class="play-button">
-          <ion-icon name="play-circle"></ion-icon>
+  <!-- Mensaje cuando no hay tarea seleccionada -->
+  <div class="empty-state" *ngIf="!selectedTask && tasks.length > 0">
+    <ion-icon name="help-circle-outline"></ion-icon>
+    <p>Selecciona una tarea para ver o crear subtareas</p>
+  </div>
+
+  <!-- Sección de subtareas -->
+  <div class="subtasks-section" *ngIf="selectedTask">
+    <div class="section-header">
+      <h2 class="section-title">
+        <ion-icon name="layers-outline" class="section-icon"></ion-icon>
+        Sub-Tareas
+      </h2>
+      <ion-button fill="solid" class="subdivide-button" 
+                  (click)="subdividirTarea()" 
+                  [disabled]="isGeneratingSubtasks">
+        <ion-icon name="sparkles-outline" slot="start"></ion-icon>
+        <span *ngIf="!subtasks.length">Generar con IA</span>
+        <span *ngIf="subtasks.length">Regenerar</span>
+      </ion-button>
+    </div>
+
+    <!-- Estado de generación con IA -->
+    <div class="generating-state" *ngIf="isGeneratingSubtasks">
+      <div class="ai-loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Generando subtareas con IA...</p>
+      </div>
+    </div>
+
+    <!-- Lista de subtareas -->
+    <ion-list lines="none" class="subtask-list" *ngIf="!isGeneratingSubtasks">
+      <ion-item-sliding *ngFor="let subtask of subtasks">
+        <ion-item class="subtask-item" [ngClass]="{'completed-card': subtask.completed}" [class.editing]="editingSubtask?.id === subtask.id">
+          <!-- Vista normal -->
+          <ng-container *ngIf="editingSubtask?.id !== subtask.id">
+            <ion-thumbnail slot="start" class="color-box" [style.background-color]="selectedTask.color || '#443673'">
+              <ion-icon name="checkmark-circle" *ngIf="subtask.completed" class="subtask-status-icon"></ion-icon>
+              <ion-icon name="ellipse-outline" *ngIf="!subtask.completed" class="subtask-status-icon"></ion-icon>
+            </ion-thumbnail>
+            
+            <div class="subtask-content">
+              <h3 class="subtask-title">{{ subtask.title }}</h3>
+              <div class="subtask-meta">
+                <span class="subtask-time">
+                  <ion-icon name="time-outline"></ion-icon>
+                  {{ subtask.duration || '40 min' }}
+                </span>
+                <span class="subtask-status" [class.in-progress]="subtask.status === 'En progreso'" [class.completed]="subtask.completed">
+                  {{ subtask.completed ? 'Completada' : (subtask.status || 'Pendiente') }}
+                </span>
+              </div>
+            </div>
+            
+            <ion-button fill="clear" slot="end" class="action-button" (click)="editSubtask(subtask)">
+              <ion-icon name="create-outline"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" slot="end" class="complete-button" (click)="toggleComplete(subtask)" [color]="subtask.completed ? 'success' : 'medium'">
+              <ion-icon [name]="subtask.completed ? 'checkbox' : 'square-outline'"></ion-icon>
+            </ion-button>
+            <ion-button fill="clear" slot="end" class="play-button" (click)="startSubtask(subtask)" [disabled]="subtask.completed">
+              <ion-icon name="play-circle-outline"></ion-icon>
+            </ion-button>
+          </ng-container>
+
+          <!-- Vista de edición -->
+          <ng-container *ngIf="editingSubtask?.id === subtask.id">
+            <div class="edit-form">
+              <ion-item lines="none" class="edit-item">
+                <ion-label position="floating">Título</ion-label>
+                <ion-input [(ngModel)]="editingSubtask.title"></ion-input>
+              </ion-item>
+              
+              <ion-item lines="none" class="edit-item">
+                <ion-label position="floating">Duración</ion-label>
+                <ion-input [(ngModel)]="editingSubtask.duration"></ion-input>
+              </ion-item>
+              
+              <ion-item lines="none" class="edit-item">
+                <ion-label position="floating">Estado</ion-label>
+                <ion-select [(ngModel)]="editingSubtask.status">
+                  <ion-select-option value="Pendiente">Pendiente</ion-select-option>
+                  <ion-select-option value="En progreso">En progreso</ion-select-option>
+                  <ion-select-option value="Completada">Completada</ion-select-option>
+                </ion-select>
+              </ion-item>
+              
+              <div class="edit-actions">
+                <ion-button fill="clear" color="danger" (click)="cancelEdit()">
+                  <ion-icon name="close-outline" slot="start"></ion-icon>
+                  Cancelar
+                </ion-button>
+                <ion-button fill="solid" color="success" (click)="saveEdit()">
+                  <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+                  Guardar
+                </ion-button>
+              </div>
+            </div>
+          </ng-container>
+        </ion-item>
+
+        <!-- Opciones deslizables -->
+        <ion-item-options side="end">
+          <ion-item-option color="danger" (click)="deleteSubtask(subtask.id)">
+            <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+          </ion-item-option>
+        </ion-item-options>
+      </ion-item-sliding>
+
+      <!-- Estado vacío -->
+      <div class="empty-state" *ngIf="subtasks.length === 0">
+        <ion-icon name="sparkles-outline"></ion-icon>
+        <p>No hay subtareas creadas</p>
+        <ion-button fill="outline" (click)="subdividirTarea()">
+          <ion-icon name="sparkles-outline" slot="start"></ion-icon>
+          Generar subtareas con IA
         </ion-button>
       </div>
-    </ion-card>
-  </ion-list>
+    </ion-list>
+  </div>
 </ion-content>

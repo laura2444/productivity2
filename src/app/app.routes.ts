@@ -17,5 +17,10 @@ export const routes: Routes = [
     path: 'task-details',
     loadComponent: () => import('./elements/task-details/task-details.page').then( m => m.TaskDetailsPage)
   },
+  {
+    path: 'sub-task',
+    loadComponent: () => import('./elements/sub-task/sub-task.page').then( m => m.SubTaskPage)
+  },
+
 
 ];

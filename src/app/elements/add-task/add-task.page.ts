@@ -1,25 +1,31 @@
 import { Component } from '@angular/core';
 import { ModalController, AlertController } from '@ionic/angular';
 import { TaskService } from 'src/services/task-service.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { addIcons } from 'ionicons';
-import {calendarOutline, checkmarkCircle, checkmarkOutline, close, flagOutline, timeOutline} from 'ionicons/icons';
+import { 
+  arrowBack, checkmark, createOutline, documentTextOutline, 
+  calendarOutline, timeOutline, pricetagsOutline, pricetagOutline, 
+  flagOutline, close, attach, checkmarkCircle 
+} from 'ionicons/icons';
 import { 
   IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, 
   IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, IonList, 
-  IonIcon, IonButtons, IonCard, IonCardContent, IonPopover, IonSearchbar, IonFab, IonFabButton, IonText } from '@ionic/angular/standalone';
+  IonIcon, IonButtons, IonCard, IonCardContent, IonModal, IonText } from '@ionic/angular/standalone';
 
 @Component({
   selector: 'app-add-task',
   templateUrl: 'add-task.page.html',
   styleUrls: ['add-task.page.scss'],
   standalone: true,
-  imports: [IonText, IonFabButton, IonFab, IonSearchbar, IonPopover, IonCardContent, IonCard, 
-    IonButtons, IonIcon, IonList, CommonModule, FormsModule, IonHeader, 
-    IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, IonLabel, 
-    IonDatetime, IonSelect, IonSelectOption, IonTextarea
-  ]
+  imports: [IonText, 
+    IonHeader, IonToolbar, IonTitle, IonContent, IonInput, IonButton, IonItem, 
+    IonLabel, IonDatetime, IonSelect, IonSelectOption, IonTextarea, 
+    IonIcon, IonButtons, IonCard, IonCardContent, IonModal,
+    CommonModule, FormsModule
+  ],
+  providers: [DatePipe]
 })
 export class AddTaskPage {
   newTask = {
@@ -27,19 +33,55 @@ export class AddTaskPage {
     title: '',
     date: '',
     time: '',
-    label: '',
+    label: 'Trabajo',
+    priority: 'Baja',
     description: '',
+    state: 'Sin empezar',
     completed: false
   };
 
-  formattedDate: string = '';
-  formattedTime: string = '';
+  showDatePicker = false;
+  showTimePicker = false;
 
   constructor(
     private taskService: TaskService, 
     private modalCtrl: ModalController, 
-    private alertCtrl: AlertController
-  ) {addIcons({close,calendarOutline,timeOutline,flagOutline,checkmarkCircle}); }
+    private alertCtrl: AlertController,
+    private datePipe: DatePipe
+  ) {
+    addIcons({
+      arrowBack, checkmark, createOutline, documentTextOutline,
+      calendarOutline, timeOutline, pricetagsOutline, pricetagOutline,
+      flagOutline, close, attach, checkmarkCircle
+    });
+  }
+
+  // Abrir selectores
+  openDatePicker() {
+    this.showDatePicker = true;
+  }
+
+  openTimePicker() {
+    this.showTimePicker = true;
+  }
+
+  // Manejar selecciones
+  dateSelected(event: any) {
+    this.showDatePicker = false;
+    if (event.detail.value) {
+      this.newTask.date = event.detail.value;
+    }
+  }
+
+  timeSelected(event: any) {
+    this.showTimePicker = false;
+    if (event.detail.value) {
+      const time = new Date(event.detail.value);
+      const hours = time.getHours().toString().padStart(2, '0');
+      const minutes = time.getMinutes().toString().padStart(2, '0');
+      this.newTask.time = `${hours}:${minutes}`;
+    }
+  }
 
   async addTask() {
     if (!this.newTask.title.trim()) {
@@ -52,8 +94,12 @@ export class AddTaskPage {
       return this.showError('Debes seleccionar una hora.');
     }
 
-    await this.taskService.addTask(this.newTask);
-    this.showConfirmation(this.newTask.title);
+    try {
+      await this.taskService.addTask(this.newTask);
+      this.showConfirmation(this.newTask.title);
+    } catch (error) {
+      this.showError('Error al crear la tarea. Por favor, inténtalo de nuevo.');
+    }
   }
 
   async showConfirmation(taskTitle: string) {
@@ -79,13 +125,5 @@ export class AddTaskPage {
 
   closeModal() {
     this.modalCtrl.dismiss();
-  }
-
-  updateFormattedDate() {
-    this.formattedDate = new Date(this.newTask.date).toLocaleDateString();
-  }
-
-  updateFormattedTime() {
-    this.formattedTime = new Date(this.newTask.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
 }

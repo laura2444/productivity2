@@ -46,16 +46,20 @@ export class Tab1Page implements OnInit {
 
   ngOnInit() {
     this.taskService.tasks$.subscribe(tasks => {
-      this.tasks = tasks.map(task => ({
-        ...task,
-        date: this.datePipe.transform(task.date, 'dd/MM/yyyy'),
-        time: this.formatTime(task.time),
-        searchText: this.createSearchText(task)
-      }));
+      this.tasks = tasks.map(task => {
+        const formattedDate = this.formatDate(task.date);
+        const formattedTime = this.formatTime(task.time);
+        return {
+          ...task,
+          date: formattedDate,
+          time: formattedTime,
+          searchText: this.createSearchText({ ...task, date: formattedDate, time: formattedTime })
+        };
+      });
       this.applyFilters();
     });
   }
-
+  
   private createSearchText(task: any): string {
     return [
       task.title,
@@ -83,17 +87,44 @@ export class Tab1Page implements OnInit {
     this.filteredTasks = filtered;
   }
 
-  formatTime(time: string): string {
-    if (!time) return '';
-    const timeParts = time.match(/(\d+):(\d+)\s?(AM|PM)?/); 
-    if (!timeParts) return time;
-    let hours = parseInt(timeParts[1], 10);
-    const minutes = timeParts[2];
-    const ampm = timeParts[3] || '';
-    if (ampm.toUpperCase() === 'PM' && hours < 12) hours += 12;
-    if (ampm.toUpperCase() === 'AM' && hours === 12) hours = 0;
-    return `${hours.toString().padStart(2, '0')}:${minutes} ${ampm}`;
+  private formatDate(date: any): string {
+    if (!date) return '';
+    
+    // Si ya está en formato dd/MM/yyyy no hacemos nada
+    if (typeof date === 'string' && date.match(/^\d{2}\/\d{2}\/\d{4}$/)) {
+      return date;
+    }
+  
+    // Si es tipo Date o un ISO string
+    try {
+      return this.datePipe.transform(new Date(date), 'dd/MM/yyyy') || '';
+    } catch {
+      return '';
+    }
   }
+  
+
+  formatTime(time: any): string {
+    if (!time) return '';
+  
+    if (typeof time !== 'string') return '';
+  
+    const is24HourFormat = time.match(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/);
+    if (is24HourFormat) return time;
+  
+    const parts = time.match(/(\d+):(\d+)\s?(AM|PM)?/i);
+    if (!parts) return time;
+  
+    let hours = parseInt(parts[1], 10);
+    const minutes = parts[2];
+    const ampm = (parts[3] || '').toUpperCase();
+  
+    if (ampm === 'PM' && hours < 12) hours += 12;
+    if (ampm === 'AM' && hours === 12) hours = 0;
+  
+    return `${hours.toString().padStart(2, '0')}:${minutes}`;
+  }
+  
 
   async openAddTaskModal() {
     const modal = await this.modalCtrl.create({

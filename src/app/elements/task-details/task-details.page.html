@@ -1,66 +1,149 @@
-<ion-header>
+<ion-header class="custom-header">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="closeModal()">
-        <ion-icon name="close"></ion-icon>
+      <ion-button (click)="closeModal()" class="close-button">
+        <ion-icon name="arrow-back" slot="icon-only"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Detalles de la Tarea</ion-title>
+    <ion-title class="header-title">Editar Tarea</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="updateTask()" class="save-button" strong="true">
+        <ion-icon name="checkmark" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-card class="task-card">
-    <ion-card-content>
-      <ion-item>
-        <ion-label position="floating">Título</ion-label>
-        <ion-input [(ngModel)]="task.title"></ion-input>
+<ion-content class="task-edit-content">
+  <!-- Sección principal -->
+  <div class="edit-container">
+    <!-- Tarjeta de información básica -->
+    <ion-card class="info-card">
+      <ion-card-content>
+        <!-- Campo de título con importancia visual -->
+        <div class="title-section">
+          <ion-icon name="create-outline" class="section-icon"></ion-icon>
+          <ion-item lines="none" class="title-input">
+            <ion-input 
+              [(ngModel)]="task.title" 
+              placeholder="Título de la tarea"
+              class="title-field">
+            </ion-input>
+          </ion-item>
+        </div>
+
+        <!-- Descripción con área ampliada -->
+        <div class="description-section">
+          <ion-icon name="document-text-outline" class="section-icon"></ion-icon>
+          <ion-textarea
+            [(ngModel)]="task.description"
+            placeholder="Añadir descripción..."
+            autoGrow="true"
+            class="description-field">
+          </ion-textarea>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sección de detalles organizada en grupos -->
+    <div class="details-group">
+      <h3 class="section-title">
+        <ion-icon name="calendar-outline"></ion-icon>
+        Fechas y hora
+      </h3>
+      
+      <ion-item lines="none" button detail="false" id="open-date-picker" class="detail-item">
+        <ion-icon name="calendar-outline" slot="start" class="detail-icon"></ion-icon>
+        <ion-label class="detail-label">Fecha de inicio</ion-label>
+        <ion-text slot="end" class="detail-value">{{ task.date || 'Seleccionar' }}</ion-text>
       </ion-item>
 
-      <!-- Selector de Fecha -->
-      <ion-item button id="open-date-picker">
-        <ion-label>Fecha: {{ task.date || 'Seleccionar' }}</ion-label>
+      <ion-item lines="none" button detail="false" id="open-time-picker" class="detail-item">
+        <ion-icon name="time-outline" slot="start" class="detail-icon"></ion-icon>
+        <ion-label class="detail-label">Hora</ion-label>
+        <ion-text slot="end" class="detail-value">{{ task.time || 'Seleccionar' }}</ion-text>
       </ion-item>
-      <ion-popover trigger="open-date-picker">
-        <ng-template>
-          <ion-datetime [(ngModel)]="task.date" (ionChange)="updateFormattedDate()" presentation="date"></ion-datetime>
-        </ng-template>
-      </ion-popover>
+    </div>
 
-      <!-- Selector de Hora -->
-      <ion-item button id="open-time-picker">
-        <ion-label>Hora: {{ task.time || 'Seleccionar' }}</ion-label>
-      </ion-item>
-      <ion-popover trigger="open-time-picker">
-        <ng-template>
-          <ion-datetime [(ngModel)]="task.time" (ionChange)="updateFormattedTime()" presentation="time"></ion-datetime>
-        </ng-template>
-      </ion-popover>
+    <!-- Sección de clasificación -->
+    <div class="details-group">
+      <h3 class="section-title">
+        <ion-icon name="pricetags-outline"></ion-icon>
+        Clasificación
+      </h3>
 
-      <ion-item>
-        <ion-label>Etiqueta</ion-label>
-        <ion-select [(ngModel)]="task.label">
+      <ion-item lines="none" class="detail-item">
+        <ion-icon name="pricetag-outline" slot="start" class="detail-icon"></ion-icon>
+        <ion-label class="detail-label">Etiqueta</ion-label>
+        <ion-select 
+          [(ngModel)]="task.label" 
+          interface="action-sheet" 
+          class="category-select">
           <ion-select-option value="Trabajo">Trabajo</ion-select-option>
           <ion-select-option value="Personal">Personal</ion-select-option>
           <ion-select-option value="Otro">Otro</ion-select-option>
         </ion-select>
       </ion-item>
 
-      <ion-item>
-        <ion-label position="floating">Descripción</ion-label>
-        <ion-textarea [(ngModel)]="task.description"></ion-textarea>
+      <ion-item lines="none" class="detail-item">
+        <ion-icon name="flag-outline" slot="start" class="detail-icon"></ion-icon>
+        <ion-label class="detail-label">Prioridad</ion-label>
+        <ion-select 
+          [(ngModel)]="task.priority" 
+          interface="action-sheet"
+          class="priority-select">
+          <ion-select-option value="Alta">Alta</ion-select-option>
+          <ion-select-option value="Media">Media</ion-select-option>
+          <ion-select-option value="Baja">Baja</ion-select-option>
+        </ion-select>
       </ion-item>
 
-      <ion-item>
-        <ion-label>Completada</ion-label>
-        <ion-checkbox [(ngModel)]="task.completed"></ion-checkbox>
+      <ion-item lines="none" class="detail-item status-item">
+        <ion-icon name="checkmark-done-outline" slot="start" class="detail-icon"></ion-icon>
+        <ion-label class="detail-label">Estado</ion-label>
+        <ion-toggle 
+          [(ngModel)]="task.completed" 
+          class="status-toggle"
+          [class.completed]="task.completed">
+          {{ task.completed ? 'Completada' : 'Pendiente' }}
+        </ion-toggle>
       </ion-item>
+    </div>
 
-      <ion-button expand="full" class="btn-guardar" (click)="updateTask()">Guardar Cambios</ion-button>
-      <ion-button expand="full" color="danger" (click)="confirmDeleteTask()">
-        <ion-icon slot="start" name="trash"></ion-icon> Eliminar Tarea
-      </ion-button>
-      
-    </ion-card-content>
-  </ion-card>
+    <!-- Sección de adjuntos mejorada -->
+    <div class="details-group">
+      <h3 class="section-title">
+        <ion-icon name="document-attach-outline"></ion-icon>
+        Adjuntos
+      </h3>
+
+      <div class="attachments-container">
+        <div class="attachment-card" *ngFor="let file of attachments">
+          <div class="file-preview">
+            <ion-icon [name]="getFileIcon(file.type)"></ion-icon>
+          </div>
+          <div class="file-info">
+            <span class="file-name">{{ file.name }}</span>
+            <span class="file-size">{{ file.size }}</span>
+          </div>
+          <ion-button fill="clear" class="file-action">
+            <ion-icon name="ellipsis-vertical"></ion-icon>
+          </ion-button>
+        </div>
+
+        <ion-button expand="block" fill="outline" class="add-attachment">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Añadir archivo
+        </ion-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón de eliminación con confirmación -->
+  <div class="delete-section">
+    <ion-button expand="block" fill="clear" color="danger" (click)="confirmDeleteTask()">
+      <ion-icon name="trash-outline" slot="start"></ion-icon>
+      Eliminar tarea
+    </ion-button>
+  </div>
 </ion-content>

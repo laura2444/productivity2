@@ -2,11 +2,30 @@ import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import { BehaviorSubject } from 'rxjs';
 
+interface Task {
+  id: number;
+  title: string;
+  description?: string;
+  date?: string;         // 👈 Añadido
+  time?: string;         // 👈 Añadido
+  completed: boolean;
+  tags?: string[];
+  subtasks?: Subtask[];
+}
+
+interface Subtask {
+  id: number;
+  title: string;
+  duration?: string;
+  status?: string;
+  completed: boolean;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class TaskService {
-  private _tasks$ = new BehaviorSubject<any[]>([]);
+  private _tasks$ = new BehaviorSubject<Task[]>([]);
   tasks$ = this._tasks$.asObservable();
   private _storage: Storage | null = null;
 
@@ -20,7 +39,7 @@ export class TaskService {
     this._tasks$.next(savedTasks);
   }
 
-  async addTask(task: { id: number; title: string; completed: boolean; subtasks?: any[] }) {
+  async addTask(task: Task) {
     const currentTasks = this._tasks$.getValue();
     const updatedTasks = [...currentTasks, { ...task, subtasks: task.subtasks || [] }];
     this._tasks$.next(updatedTasks);
@@ -41,17 +60,29 @@ export class TaskService {
     await this._storage?.set('tasks', updatedTasks);
   }
 
-  async updateTask(updatedTask: any) {
+  // Versión corregida que acepta tanto Task como parámetro único
+  async updateTask(task: Task) {
     const tasks = this._tasks$.getValue();
-    const index = tasks.findIndex(task => task.id === updatedTask.id);
+    const index = tasks.findIndex(t => t.id === task.id);
     if (index !== -1) {
-      tasks[index] = { ...updatedTask };
+      tasks[index] = { ...task };
       this._tasks$.next(tasks);
       await this._storage?.set('tasks', tasks);
     }
   }
 
-  async addSubtasks(taskId: number, subtasks: { id: number; title: string; completed: boolean }[]) {
+  // Versión alternativa si prefieres mantener id y task separados
+  async updateTaskById(id: number, updatedTask: Partial<Task>) {
+    const tasks = this._tasks$.getValue();
+    const index = tasks.findIndex(task => task.id === id);
+    if (index !== -1) {
+      tasks[index] = { ...tasks[index], ...updatedTask };
+      this._tasks$.next(tasks);
+      await this._storage?.set('tasks', tasks);
+    }
+  }
+
+  async addSubtasks(taskId: number, subtasks: Subtask[]) {
     const tasks = this._tasks$.getValue();
     const index = tasks.findIndex(task => task.id === taskId);
     if (index !== -1) {
@@ -61,13 +92,11 @@ export class TaskService {
     }
   }
 
-  getSubtasks(taskId: number) {
+  getSubtasks(taskId: number): Subtask[] {
     const tasks = this._tasks$.getValue();
     const task = tasks.find(task => task.id === taskId);
     return task ? task.subtasks || [] : [];
   }
-
-  // ✅ FUNCIONES FALTANTES
 
   async deleteTask(id: number) {
     const updatedTasks = this._tasks$.getValue().filter(task => task.id !== id);
@@ -78,9 +107,8 @@ export class TaskService {
   async loadTasks() {
     const savedTasks = await this._storage?.get('tasks') || [];
     this._tasks$.next(savedTasks);
+    return savedTasks;
   }
-
-  // ✅ (OPCIONAL) Utilidades reutilizables
 
   private async saveToStorage() {
     await this._storage?.set('tasks', this._tasks$.getValue());
@@ -90,4 +118,6 @@ export class TaskService {
     const savedTasks = await this._storage?.get('tasks') || [];
     this._tasks$.next(savedTasks);
   }
+
+  
 }

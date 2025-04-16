@@ -1,94 +1,140 @@
-/* Estilos para el header */
+/* Estilos generales */
+.task-edit-content {
+  --background: #f5f5f8;
+  --padding-top: 0;
+  --padding-bottom: 20px;
+}
+
 .custom-header {
   ion-toolbar {
     --background: #443673;
     --color: #f2e4d8;
     --border-width: 0;
-    padding: 0 16px;
-    
-    .custom-title {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-    }
+    padding: 0 8px;
   }
 
-  .close-button {
+  .header-title {
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .close-button, .save-button {
     --color: #f2e4d8;
     --padding-start: 0;
     --padding-end: 0;
   }
+
+  .save-button {
+    --color: #4caf50;
+  }
 }
 
-/* Contenido principal */
-.custom-content {
-  --background: #f5f5f8;
-  --padding-top: 16px;
-  --padding-bottom: 16px;
+/* Contenedor principal */
+.edit-container {
+  padding: 0 16px;
 }
 
-/* Tarjeta de formulario */
-.task-card {
+/* Tarjeta de información */
+.info-card {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  margin: 0;
-  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05);
+  margin: 16px 0 24px;
+  overflow: visible;
 
   ion-card-content {
     padding: 16px;
   }
 }
 
-/* Campos de formulario */
-.custom-input {
-  --background: #f9f9fb;
-  --border-radius: 12px;
-  --padding-start: 12px;
-  --padding-end: 12px;
-  --inner-padding-end: 0;
-  margin-bottom: 16px;
-  border: 1px solid #e0e0e5;
-  transition: all 0.3s ease;
+.title-section, .description-section {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
 
-  &:focus-within {
-    border-color: #d0b0d9;
-    box-shadow: 0 0 0 2px rgba(208, 176, 217, 0.2);
-  }
+.section-icon {
+  color: #a0a0c0;
+  font-size: 20px;
+  margin-top: 12px;
+}
 
-  .input-label {
-    color: #6a6a8a;
-    font-size: 14px;
-    font-weight: 500;
-    margin-bottom: 4px;
-  }
+.title-input {
+  --background: transparent;
+  --padding-start: 0;
+  flex: 1;
 
-  .input-field {
-    --padding-top: 8px;
-    --padding-bottom: 8px;
-    --color: #221c40;
-    font-size: 16px;
+  .title-field {
+    --padding-top: 0;
+    --padding-bottom: 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: #221c40;
   }
 }
 
-.date-time-item {
-  --min-height: 56px;
+.description-field {
+  background: #f9f9fb;
+  border-radius: 12px;
+  padding: 12px;
+  min-height: 100px;
+  font-size: 16px;
+  color: #221c40;
+  line-height: 1.4;
+  border: 1px solid #e0e0e5;
+  flex: 1;
+}
 
-  .picker-icon {
+/* Grupos de detalles */
+.details-group {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #443673;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0 0 12px 8px;
+
+  ion-icon {
+    font-size: 18px;
+    color: #a0a0c0;
+  }
+}
+
+.detail-item {
+  --background: white;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --min-height: 56px;
+  border-radius: 12px;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  .detail-icon {
     color: #a0a0c0;
     font-size: 20px;
     margin-right: 12px;
   }
 
-  .selected-value {
-    color: #221c40;
+  .detail-label {
     font-size: 16px;
+    color: #221c40;
     font-weight: 500;
+  }
+
+  .detail-value {
+    font-size: 16px;
+    color: #6a6a8a;
   }
 }
 
 /* Selectores personalizados */
-.custom-select {
+.category-select, .priority-select {
   --placeholder-color: #221c40;
   --placeholder-opacity: 1;
   color: #221c40;
@@ -102,39 +148,228 @@
   }
 }
 
-/* Popovers y datetime */
-.custom-popover {
-  --width: auto;
-  --min-width: 300px;
+/* Toggle de estado */
+.status-item {
+  .status-toggle {
+    --background: #f0f0f5;
+    --background-checked: #4caf50;
+    --handle-background: white;
+    --handle-background-checked: white;
+    padding: 8px;
+    height: 32px;
+    width: 100px;
+
+    &::part(track) {
+      border-radius: 16px;
+    }
+
+    &::part(handle) {
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &.completed {
+      --background-checked: #4caf50;
+    }
+  }
 }
 
-.custom-datetime {
-  --background: white;
+/* Adjuntos */
+.attachments-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.attachment-card {
+  display: flex;
+  align-items: center;
+  background: white;
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+
+  .file-preview {
+    width: 40px;
+    height: 40px;
+    background: #f0f0f5;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+
+    ion-icon {
+      font-size: 20px;
+      color: #6a6a8a;
+    }
+  }
+
+  .file-info {
+    flex: 1;
+
+    .file-name {
+      display: block;
+      font-size: 14px;
+      color: #221c40;
+      margin-bottom: 2px;
+    }
+
+    .file-size {
+      font-size: 12px;
+      color: #a0a0c0;
+    }
+  }
+
+  .file-action {
+    --color: #a0a0c0;
+    --padding-start: 0;
+    --padding-end: 0;
+  }
 }
 
-/* Botón de crear */
-.btn-crear {
-  --background: #443673;
-  --background-activated: #5a4a8a;
-  --background-hover: #4d3c7d;
-  --color: white;
+.add-attachment {
+  --border-color: #d0b0d9;
+  --color: #443673;
   --border-radius: 12px;
   --padding-top: 16px;
   --padding-bottom: 16px;
-  --box-shadow: 0 4px 12px rgba(68, 54, 115, 0.3);
-  font-weight: 600;
-  margin-top: 24px;
-  text-transform: none;
-  transition: transform 0.2s ease;
-
-  &:active {
-    transform: scale(0.98);
-  }
+  margin-top: 8px;
 
   ion-icon {
     font-size: 20px;
-    margin-right: 8px;
+  }
+}
+
+/* Sección de eliminación */
+.delete-section {
+  padding: 0 16px;
+  margin-top: 24px;
+
+  ion-button {
+    --color: #f44336;
+    font-weight: 500;
+    --background-hover: rgba(244, 67, 54, 0.1);
+  }
+}
+
+/* ------------------------- */
+/* ESTILOS PARA DATETIME - CORREGIDOS */
+/* ------------------------- */
+
+/* Fondo del modal */
+ion-modal {
+  --background: rgba(242, 228, 217, 0.9); /* Usando f2e4d9 con transparencia */
+}
+
+/* Contenedor principal del datetime */
+ion-datetime {
+  --background: #f2e4d9; /* Fondo claro para mejor contraste */
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Textos dentro del datetime */
+ion-datetime {
+  color: #221c40; /* Texto oscuro para mejor legibilidad */
+  
+  /* Cabecera */
+  .datetime-header {
+    color: #443673;
+    font-weight: 600;
+  }
+  
+  /* Días de la semana */
+  .datetime-weekday-container {
+    color: #443673;
+  }
+  
+  /* Días del mes */
+  .datetime-day {
+    color: #221c40;
+  }
+  
+  /* Día seleccionado */
+  .datetime-day-selected {
+    background: #d0b0d9;
+    color: #221c40;
+  }
+  
+  /* Mes y año */
+  .datetime-month-year {
+    color: #443673;
+  }
+  
+  /* Botones */
+  .datetime-action-buttons ion-button {
+    --color: #443673;
+    --background-hover: rgba(208, 176, 217, 0.3); /* d0b0d9 con transparencia */
+  }
+}
+
+/* Ajustes específicos para el modo oscuro */
+@media (prefers-color-scheme: dark) {
+  ion-datetime {
+    --background: #221c40;
+    color: #f2e4d9;
+    
+    .datetime-header,
+    .datetime-weekday-container,
+    .datetime-month-year {
+      color: #d0b0d9;
+    }
+    
+    .datetime-day {
+      color: #f2e4d9;
+    }
+    
+    .datetime-day-selected {
+      background: #443673;
+      color: #f2e4d9;
+    }
+  }
+}
+
+/* ------------------------- */
+/* ESTILOS EXISTENTES MEJORADOS */
+/* ------------------------- */
+
+.detail-item {
+  /* Manteniendo tus estilos pero asegurando contraste */
+  .detail-value {
+    color: #221c40 !important;
+    font-weight: 500;
+    
+    &:empty::after {
+      color: #a0a0c0; /* Color más suave para placeholder */
+    }
+  }
+}
+
+/* Efecto al seleccionar */
+.datetime-day-active {
+  background: #443673 !important;
+  color: #f2e4d9 !important;
+}
+
+/* Botones de acción */
+.datetime-action-buttons {
+  border-top: 1px solid rgba(208, 176, 217, 0.3); /* d0b0d9 con transparencia */
+  
+  ion-button {
+    --color: #443673;
+    font-weight: 500;
+  }
+}
+
+/* ------------------------- */
+/* RESPONSIVO */
+/* ------------------------- */
+
+@media (max-width: 400px) {
+  ion-datetime {
+    --width: 100%;
+    font-size: 14px;
+    display: block;
+    margin: 0 auto;
   }
 }

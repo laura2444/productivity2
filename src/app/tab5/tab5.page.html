@@ -1,56 +1,118 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
+<ion-header [translucent]="true" class="streak-header">
+  <ion-toolbar class="toolbar-custom">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/"></ion-back-button>
+      <ion-back-button defaultHref="/tabs/tab1" class="back-button" text=""></ion-back-button>
     </ion-buttons>
-    <ion-title>
-      Racha Axolot
+    <ion-title class="custom-title">
+      <ion-icon name="flame-outline" class="title-icon"></ion-icon>
+      <span>Mi Axolotl</span>
+      <span class="streak-counter">
+        <ion-icon name="flame"></ion-icon>
+        7 días
+      </span>
     </ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <div>
-    <ion-img src="../../assets/ajolote.jpeg"></ion-img>
+<ion-content [fullscreen]="true" class="axolotl-content">
+  <div class="axolotl-container">
+    <div class="egg-container">
+      <div class="glow-effect"></div>
+      <ion-img src="../../assets/axolot.png" class="axolotl-image"></ion-img>
+    </div>
+
+    <div class="axolotl-status">
+      <h2 class="axolotl-name">Axi</h2>
+      <div class="mood-indicator">
+        <span class="mood-label">Feliz</span>
+        <div class="mood-bar">
+          <div class="mood-progress"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-card">
+      <div class="stat-item">
+        <div class="stat-icon">
+          <ion-icon name="heart"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Salud</span>
+          <div class="stat-bar">
+            <div class="stat-progress health"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <ion-icon name="star"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Experiencia</span>
+          <div class="stat-bar">
+            <div class="stat-progress xp"></div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="stat-item">
+        <div class="stat-icon">
+          <ion-icon name="battery-charging"></ion-icon>
+        </div>
+        <div class="stat-info">
+          <span class="stat-label">Energía</span>
+          <div class="stat-bar">
+            <div class="stat-progress energy"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <h3>Tarea Diaria Completada</h3>
+  <div class="streak-section">
+    <h3 class="section-title">
+      <ion-icon name="calendar-outline"></ion-icon>
+      Tareas Diarias Completadas
+    </h3>
+    
+    <div class="day-grid">
+      <div class="day-column" *ngFor="let day of ['L', 'M', 'Mi', 'J', 'V', 'S', 'D']; let i = index">
+        <div class="day-label">{{ day }}</div>
+        <div class="day-marker" [class.completed]="true" [class.today]="i === 4">
+          <ion-icon name="checkmark-circle" *ngIf="i < 5"></ion-icon>
+          <ion-icon name="ellipse-outline" *ngIf="i >= 5"></ion-icon>
+        </div>
+      </div>
+    </div>
+    
+    <div class="streak-info">
+      <div class="streak-message">
+        <ion-icon name="trophy"></ion-icon>
+        <span>¡Llevas 7 días consecutivos!</span>
+      </div>
+      <div class="next-reward">
+        <span>Próxima recompensa: 3 días más</span>
+      </div>
+    </div>
+  </div>
 
-  <!-- Tabla de racha -->
-  <ion-grid [fixed]="true">
-    <!-- Dias de la semana -->
-    <ion-row>
-      <ion-col>L</ion-col>
-      <ion-col>M</ion-col>
-      <ion-col>MI</ion-col>
-      <ion-col>J</ion-col>
-      <ion-col>V</ion-col>
-      <ion-col>S</ion-col>
-      <ion-col>D</ion-col>
-    </ion-row>
-    <!-- Checks -->
-    <ion-row id="checkRow">
-      <ion-col>
-        <ion-icon name="checkbox-outline"></ion-icon>
-      </ion-col>
-      <ion-col>
-        <ion-icon name="checkbox-outline"></ion-icon>
-      </ion-col>
-      <ion-col>
-        <ion-icon name="checkbox-outline"></ion-icon>
-      </ion-col>
-      <ion-col>
-        <ion-icon name="checkbox-outline"></ion-icon>
-      </ion-col>
-      <ion-col>
-        <ion-icon name="checkbox-outline"></ion-icon>
-      </ion-col>
-      <ion-col>
-        <ion-icon name="checkbox-outline"></ion-icon>
-      </ion-col>
-      <ion-col>
-        <ion-icon name="checkbox-outline"></ion-icon>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  <div class="actions-section">
+    <div class="action-buttons">
+      <ion-button class="action-button feed">
+        <ion-icon name="nutrition-outline"></ion-icon>
+        Alimentar
+      </ion-button>
+      
+      <ion-button class="action-button play">
+        <ion-icon name="game-controller-outline"></ion-icon>
+        Jugar
+      </ion-button>
+      
+      <ion-button class="action-button customize">
+        <ion-icon name="color-palette-outline"></ion-icon>
+        Personalizar
+      </ion-button>
+    </div>
+  </div>
 </ion-content>

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IonContent, IonHeader, IonTitle, IonToolbar, IonCard, IonCardHeader, IonCardTitle, IonSearchbar, IonFab, IonFabButton, IonIcon, IonThumbnail, IonCardContent, IonButtons, IonBackButton } from '@ionic/angular/standalone';
 import { RouterModule } from '@angular/router';
-import { barChartOutline } from 'ionicons/icons';
+import { barChartOutline, checkmarkCircle } from 'ionicons/icons';
 import { addIcons } from 'ionicons';
 import { ProgressChartComponent } from '../components/progress-chart/progress-chart.component';
 
@@ -32,7 +32,7 @@ export class Tab4Page implements OnInit {
   today: Date = new Date();
 
   constructor() {
-    addIcons({ barChartOutline });
+    addIcons({barChartOutline,checkmarkCircle});
   }
 
   ngOnInit() {}

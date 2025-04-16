@@ -1,26 +1,36 @@
-<ion-header [translucent]="true">
-
-  <ion-toolbar >
-    <div class="header-container">
-      <ion-buttons slot="start">
-        <ion-back-button default-href="#"></ion-back-button>
-      </ion-buttons>
-      <ion-title class="custom-title">
-        <ion-icon name="bar-chart-outline"></ion-icon>
-        Estadisticas</ion-title>
-    </div>
-
+<ion-header [translucent]="true" class="stats-header">
+  <ion-toolbar class="toolbar-custom">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/tab1" class="back-button" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title class="custom-title">
+      <ion-icon name="bar-chart-outline" class="title-icon"></ion-icon>
+      <span>Estadísticas</span>
+    </ion-title>
   </ion-toolbar>
-
 </ion-header>
 
-<ion-content [fullscreen]="true">
-
-
-  <div class="weekly-chart">
-    <h3>Estadísticas semanales</h3>
+<ion-content [fullscreen]="true" class="stats-content">
+  <!-- Resumen de progreso -->
+  <div class="progress-summary">
+    <h3 class="date-header">Hoy, {{ today | date: 'EEEE, d MMM' }}</h3>
     
-    <!-- Gráfica -->
+    <div class="progress-wrapper">
+      <app-progress-chart [completed]="16" [total]="20"></app-progress-chart>
+      <div class="motivation-wrapper">
+        <h2 class="motivation-title">¡Buen trabajo!</h2>
+        <p class="motivation-text">Ve a tu propio ritmo</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Estadísticas semanales -->
+  <div class="stats-card">
+    <div class="card-header">
+      <h3>Estadísticas semanales</h3>
+      <span class="period-label">Última semana</span>
+    </div>
+    
     <div class="chart-wrapper">
       <div class="y-axis">
         <span>100%</span>
@@ -31,10 +41,18 @@
       </div>
 
       <div class="chart">
-        <div class="bar-container" *ngFor="let day of weekData">  <!-- itera sobre weekData y crea una barra por cada dia de la semana-->
-          <div class="bar" [style.height]="getPercentage(day.completed, day.total) + '%'"></div> <!-- itera sobre getPercentage pasandole los parametros de dias completados y total y esto lo toma como la altura dinamica de cada barra-->
+        <div class="bar-container" *ngFor="let day of weekData">
+          <div class="bar-wrapper">
+            <div class="bar-background"></div>
+            <div class="bar" [style.height]="getPercentage(day.completed, day.total) + '%'"
+                 [ngClass]="{'high': getPercentage(day.completed, day.total) > 75, 
+                            'medium': getPercentage(day.completed, day.total) > 40 && getPercentage(day.completed, day.total) <= 75,
+                            'low': getPercentage(day.completed, day.total) <= 40}">
+              <span class="percentage" *ngIf="day.total > 0">{{getPercentage(day.completed, day.total)}}%</span>
+            </div>
+          </div>
           <div class="day-info">
-            <span class="day-label">{{ day.label }}</span> <!--imprime el nombre del dia-->
+            <span class="day-label">{{ day.label }}</span>
             <span class="day-count">{{ day.completed }}/{{ day.total }}</span>
           </div>
         </div>
@@ -42,34 +60,41 @@
     </div>
   </div>
 
-  <div class="progress-wrapper" >
-    <app-progress-chart [completed]="16" [total]="20"></app-progress-chart>
-    <h1 id="tittle-wrapper">Ve a tu propio ritmo :)</h1>
-  </div>
+  <!-- Tareas completadas hoy -->
+  <div class="completed-tasks-section">
+    <div class="section-header">
+      <h3>Tareas completadas</h3>
+      <span class="view-all">Ver todas</span>
+    </div>
 
-
-  <h3 class="date">Hoy, {{ today | date: 'MMM d'}}</h3>
-
-
-
-  <ion-card class="container-card" >
-
-    <div class="card">
-        <div class="card-content">
-          <ion-thumbnail slot="start" class="color-box"></ion-thumbnail>
-          <div class="card-text">
-            <ion-card-header >
-              <ion-card-title>Desarrollo de software</ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              [Completada]
-            </ion-card-content>
-    
+    <ion-card class="task-card">
+      <div class="task-content">
+        <ion-thumbnail class="color-box" style="--background: #443673">
+          <ion-icon name="checkmark-circle" class="complete-icon"></ion-icon>
+        </ion-thumbnail>
+        <div class="task-details">
+          <h4 class="task-title">Desarrollo de software</h4>
+          <div class="task-meta">
+            <span class="task-category">Proyecto</span>
+            <span class="completion-time">Completada hace 2h</span>
           </div>
         </div>
       </div>
-      </ion-card>
-  
+    </ion-card>
 
-  <!--<app-explore-container name="Tab 1 page"></app-explore-container>-->
+    <ion-card class="task-card">
+      <div class="task-content">
+        <ion-thumbnail class="color-box" style="--background: #5D54A4">
+          <ion-icon name="checkmark-circle" class="complete-icon"></ion-icon>
+        </ion-thumbnail>
+        <div class="task-details">
+          <h4 class="task-title">Análisis de requerimientos</h4>
+          <div class="task-meta">
+            <span class="task-category">Documentación</span>
+            <span class="completion-time">Completada hace 4h</span>
+          </div>
+        </div>
+      </div>
+    </ion-card>
+  </div>
 </ion-content>
