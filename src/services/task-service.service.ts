@@ -6,8 +6,8 @@ interface Task {
   id: number;
   title: string;
   description?: string;
-  date?: string;         // 👈 Añadido
-  time?: string;         // 👈 Añadido
+  date?: string;     
+  time?: string;       
   completed: boolean;
   tags?: string[];
   subtasks?: Subtask[];
@@ -16,6 +16,7 @@ interface Task {
 interface Subtask {
   id: number;
   title: string;
+  description?: string; 
   duration?: string;
   status?: string;
   completed: boolean;

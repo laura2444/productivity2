@@ -70,21 +70,7 @@
   }
   
   /* Botón especial central para efecto visual */
-  ion-tab-button[tab="tab3"] {
-    ion-icon {
-      color: white;
-      background: linear-gradient(45deg, #443673, #5a4a8a);
-      padding: 10px;
-      border-radius: 16px;
-      box-shadow: 0 4px 12px rgba(68, 54, 115, 0.3);
-    }
-    
-    &.tab-selected ion-icon {
-      transform: translateY(-6px) scale(1.1);
-      background: linear-gradient(45deg, #443673, #6c5ca6);
-      box-shadow: 0 6px 16px rgba(68, 54, 115, 0.4);
-    }
-  }
+
 }
 
 /* Animación de carga en la transición entre tabs */
@@ -123,14 +109,5 @@
       }
     }
     
-    ion-tab-button[tab="tab3"] {
-      ion-icon {
-        background: linear-gradient(45deg, #584989, #7969b5);
-      }
-      
-      &.tab-selected ion-icon {
-        background: linear-gradient(45deg, #6354a3, #8a7bc4);
-      }
-    }
   }
 }

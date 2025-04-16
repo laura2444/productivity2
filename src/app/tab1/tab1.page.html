@@ -39,9 +39,7 @@
   </ion-segment>
 
   <!-- Lista de tareas filtradas -->
-  <!-- Dentro del ion-content -->
-<div *ngFor="let task of filteredTasks; trackBy: trackById" class="container-card" [ngClass]="{'completed-card': task.completed}">
-
+  <div *ngFor="let task of filteredTasks; trackBy: trackById" class="container-card" [ngClass]="{'completed-card': task.completed}">
     <ion-thumbnail class="color-box" [style.background-color]="task.color || '#D0B0D9'"></ion-thumbnail>
     <div class="card-text" (click)="openTaskDetails(task)">
       <div class="card-header">
@@ -56,6 +54,19 @@
         <ion-icon name="calendar-outline" style="margin-left: 8px"></ion-icon>
         {{ task.date }}
       </ion-card-subtitle>
+      
+      <!-- Barra de progreso de subtareas -->
+      <div class="subtask-progress" *ngIf="getSubtasksCount(task) > 0">
+        <div class="progress-text">
+          {{ getCompletedSubtasksCount(task) }}/{{ getSubtasksCount(task) }} subtareas
+        </div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" 
+               [style.width]="getSubtaskCompletionPercentage(task) + '%'">
+          </div>
+        </div>
+      </div>
+      
       <div class="card-footer" *ngIf="task.tags">
         <ion-chip *ngFor="let tag of task.tags" outline="true">
           <ion-label>{{tag}}</ion-label>

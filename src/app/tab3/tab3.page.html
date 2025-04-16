@@ -79,6 +79,7 @@
             
             <div class="subtask-content">
               <h3 class="subtask-title">{{ subtask.title }}</h3>
+              <p class="subtask-description" *ngIf="subtask.description">{{ subtask.description }}</p>
               <div class="subtask-meta">
                 <span class="subtask-time">
                   <ion-icon name="time-outline"></ion-icon>
@@ -96,9 +97,9 @@
             <ion-button fill="clear" slot="end" class="complete-button" (click)="toggleComplete(subtask)" [color]="subtask.completed ? 'success' : 'medium'">
               <ion-icon [name]="subtask.completed ? 'checkbox' : 'square-outline'"></ion-icon>
             </ion-button>
-            <ion-button fill="clear" slot="end" class="play-button" (click)="startSubtask(subtask)" [disabled]="subtask.completed">
+            <!-- <ion-button fill="clear" slot="end" class="play-button" (click)="startSubtask(subtask)" [disabled]="subtask.completed">
               <ion-icon name="play-circle-outline"></ion-icon>
-            </ion-button>
+            </ion-button> -->
           </ng-container>
 
           <!-- Vista de edición -->
@@ -107,6 +108,11 @@
               <ion-item lines="none" class="edit-item">
                 <ion-label position="floating">Título</ion-label>
                 <ion-input [(ngModel)]="editingSubtask.title"></ion-input>
+              </ion-item>
+              
+              <ion-item lines="none" class="edit-item">
+                <ion-label position="floating">Descripción</ion-label>
+                <ion-input [(ngModel)]="editingSubtask.description"></ion-input>
               </ion-item>
               
               <ion-item lines="none" class="edit-item">

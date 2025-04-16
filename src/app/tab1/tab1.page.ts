@@ -174,4 +174,26 @@ export class Tab1Page implements OnInit {
   trackById(index: number, task: any) {
     return task.id;
   }
+
+  getCompletedSubtasksCount(task: any): number {
+    if (!task.subtasks || !Array.isArray(task.subtasks)) {
+      return 0;
+    }
+    return task.subtasks.filter((st: { completed: any; }) => st.completed).length;
+  }
+  
+  getSubtasksCount(task: any): number {
+    if (!task.subtasks || !Array.isArray(task.subtasks)) {
+      return 0;
+    }
+    return task.subtasks.length;
+  }
+  
+  getSubtaskCompletionPercentage(task: any): number {
+    const total = this.getSubtasksCount(task);
+    if (total === 0) return 0;
+    return (this.getCompletedSubtasksCount(task) / total) * 100;
+  }
+
+  
 }

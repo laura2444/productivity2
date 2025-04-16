@@ -1,17 +1,135 @@
-<ion-header [translucent]="true">
+<ion-header [translucent]="true" class="home-header">
   <ion-toolbar>
-    <ion-title>
-      Tab 2
-    </ion-title>
+    <div class="header-content">
+      <ion-title class="home-title">
+        Bienvenido
+      </ion-title>
+    </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Tab 2</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content [fullscreen]="true" class="home-content">
+  <!-- Tarjeta de resumen del día -->
+  <div class="welcome-card">
+    <div class="welcome-header">
+      <h1>Hola, Usuario</h1>
+      <p class="date-display">{{ currentDate | date:'EEEE, d MMMM' }}</p>
+    </div>
+    <div class="stats-overview">
+      <div class="stat-item">
+        <div class="stat-value">{{ pendingTasksCount }}</div>
+        <div class="stat-label">Pendientes</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ completedTasksToday }}</div>
+        <div class="stat-label">Completadas hoy</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-value">{{ totalTasksCount }}</div>
+        <div class="stat-label">Total</div>
+      </div>
+    </div>
+  </div>
 
-  <app-explore-container name="Tab 2 page"></app-explore-container>
+  <!-- Tareas de hoy -->
+  <div class="section-container">
+    <div class="section-header">
+      <h2>Tareas para hoy</h2>
+      <ion-button fill="clear" routerLink="/tabs/tab1" class="view-all">
+        Ver todas
+        <ion-icon name="chevron-forward" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+    
+    <div *ngIf="todayTasks.length > 0" class="tasks-container">
+      <div *ngFor="let task of todayTasks" class="today-task-card" [ngClass]="{'completed-task': task.completed}">
+        <div class="task-status">
+          <ion-checkbox [(ngModel)]="task.completed" (ionChange)="updateTaskStatus(task)"></ion-checkbox>
+        </div>
+        <div class="task-content" (click)="openTaskDetails(task)">
+          <div class="task-title">{{ task.title }}</div>
+          <div class="task-time" *ngIf="task.time">
+            <ion-icon name="time-outline"></ion-icon> {{ task.time }}
+          </div>
+          <!-- Barra de progreso si tiene subtareas -->
+          <div class="subtask-progress" *ngIf="getSubtasksCount(task) > 0">
+            <div class="progress-text">
+              {{ getCompletedSubtasksCount(task) }}/{{ getSubtasksCount(task) }}
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar" [style.width]="getSubtaskCompletionPercentage(task) + '%'"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="todayTasks.length === 0" class="empty-tasks">
+      <ion-icon name="calendar-outline"></ion-icon>
+      <p>No tienes tareas para hoy</p>
+      <ion-button fill="outline" (click)="openAddTaskModal()">
+        Crear tarea
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Próximas tareas -->
+  <div class="section-container">
+    <div class="section-header">
+      <h2>Próximas tareas</h2>
+      <ion-button fill="clear" routerLink="/tabs/tab1" class="view-all">
+        Ver todas
+        <ion-icon name="chevron-forward" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+    
+    <div *ngIf="upcomingTasks.length > 0" class="tasks-container">
+      <div *ngFor="let task of upcomingTasks" class="upcoming-task-card">
+        <div class="upcoming-date">
+          <div class="date-day">{{ formatDateDay(task.date) }}</div>
+          <div class="date-month">{{ formatDateMonth(task.date) }}</div>
+        </div>
+        <div class="task-content" (click)="openTaskDetails(task)">
+          <div class="task-title">{{ task.title }}</div>
+          <div class="task-time" *ngIf="task.time">
+            <ion-icon name="time-outline"></ion-icon> {{ task.time }}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div *ngIf="upcomingTasks.length === 0" class="empty-tasks">
+      <ion-icon name="calendar-clear-outline"></ion-icon>
+      <p>No hay próximas tareas programadas</p>
+      <ion-button fill="outline" (click)="openAddTaskModal()">
+        Crear tarea
+      </ion-button>
+    </div>
+  </div>
+
+  <!-- Productividad semanal -->
+  <div class="section-container">
+    <div class="section-header">
+      <h2>Tu semana</h2>
+    </div>
+    
+    <div class="weekly-progress">
+      <div class="week-days">
+        <div *ngFor="let day of weekDays" class="day-column">
+          <div class="day-label">{{ day.shortName }}</div>
+          <div class="day-circle" [ngClass]="{'active-day': day.isToday, 'completed-day': day.completed}">
+            {{ day.date }}
+          </div>
+          <div class="tasks-count">{{ day.tasksCount }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón flotante para agregar tarea -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openAddTaskModal()" class="fab-button">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>
