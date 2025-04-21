@@ -357,3 +357,40 @@
   max-height: none;
   line-clamp: initial;
 }
+
+/* Añade esto a tu archivo SCSS */
+.select-text[part="text"] {
+  color: #443673; /* Color morado que coincide con tu tema principal */
+}
+
+/* Si necesitas más especificidad */
+ion-select::part(text) {
+  color: #443673;
+}
+
+/* En caso de que sea un ion-item con select */
+ion-item ion-select::part(text) {
+  color: #443673;
+}
+
+/* Añade esto a tu archivo SCSS */
+.label-text {
+  color: #443673; /* Color morado que coincide con tu tema principal */
+}
+
+/* Para mayor especificidad si es necesario */
+ion-select .label-text,
+ion-item .label-text {
+  color: #443673;
+}
+
+.task-select-item ion-label,
+.task-dropdown .label-text {
+  color: #443673;
+  opacity: 1; /* Asegura que sea completamente visible */
+}
+
+/* Para el label flotante en estados diferentes */
+.task-select-item ion-label.label-floating {
+  color: #443673;
+}

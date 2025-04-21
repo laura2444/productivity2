@@ -184,7 +184,7 @@ export class Tab3Page implements OnInit, OnDestroy {
             name: 'count',
             type: 'number',
             min: 1,
-            max: 10,
+            max: 7,
             value: 3
           }
         ],

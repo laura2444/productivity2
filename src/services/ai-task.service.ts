@@ -8,7 +8,7 @@ import { catchError, map, switchMap, tap, timeout } from 'rxjs/operators';
 })
 export class AiTaskService {
   private apiKey = 'AIzaSyABBoS19JdslBti21hcRT3tT7ASrc8EWsE'; 
-  private model = 'gemini-2.0-flash'; // Cambiado a una versión de modelo que existe
+  private model = 'gemini-2.0-flash'; 
   
   constructor(private http: HttpClient) {}
 
