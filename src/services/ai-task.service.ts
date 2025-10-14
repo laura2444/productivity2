@@ -16,7 +16,7 @@ export class AiTaskService {
   generateSubtasks(task: any, count: number = 3): Observable<any[]> {
     // Verificar si tenemos los datos necesarios
     if (!task || !task.title) {
-      console.error('Se requiere título de tarea para generar subtareas');
+      console.error('Se requiere título de tarea para generar subtareass');
       return throwError(() => new Error('Datos de tarea incompletos'));
     }
 
