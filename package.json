@@ -30,6 +30,7 @@
     "@ionic/angular": "^8.0.0",
     "@ionic/storage-angular": "^4.0.0",
     "chart.js": "^4.4.8",
+    "dotenv": "^17.2.3",
     "ionicons": "^7.4.0",
     "rxjs": "~7.8.0",
     "tslib": "^2.3.0",

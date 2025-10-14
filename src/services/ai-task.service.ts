@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, switchMap, tap, timeout } from 'rxjs/operators';
+import { environment } from 'src/environments/environment.prod';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AiTaskService {
-  private apiKey = 'AIzaSyABBoS19JdslBti21hcRT3tT7ASrc8EWsE'; 
+  private apiKey = environment.geminiApiKey;
   private model = 'gemini-2.0-flash'; 
   
   constructor(private http: HttpClient) {}
