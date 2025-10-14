@@ -74,4 +74,7 @@ testem.log
 Thumbs.db
 
 
-src\environments\environment.prod.ts
+\src\environments\environment.prod.ts
+
+# Ignorar archivos de environment de Angular
+/src/environments/environment*.ts
