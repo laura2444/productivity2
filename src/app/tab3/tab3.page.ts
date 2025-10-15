@@ -15,14 +15,13 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { IonThumbnail } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
-import { HttpClient, provideHttpClient } from '@angular/common/http';
 import { finalize, Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tab3',
   templateUrl: 'tab3.page.html',
   styleUrls: ['tab3.page.scss'],
-  standalone: true, // Asegurarse de que el componente es standalone
+  standalone: true,
   imports: [
     FormsModule, IonInput, IonFab, IonFabButton, IonSearchbar, IonCardSubtitle, 
     IonLabel, IonCard, IonCardHeader, IonCardTitle, IonCardContent, IonButtons, 
@@ -45,9 +44,8 @@ export class Tab3Page implements OnInit, OnDestroy {
     private aiTaskService: AiTaskService,
     private alertController: AlertController,
     private toastController: ToastController,
-    private loadingController: LoadingController,
-    private http: HttpClient
-
+    private loadingController: LoadingController
+    // ✅ Eliminado HttpClient - no es necesario aquí
   ) {
     addIcons({ 
       addCircleOutline, createOutline, checkmarkOutline, closeOutline, cutOutline,
@@ -56,7 +54,6 @@ export class Tab3Page implements OnInit, OnDestroy {
       checkbox, squareOutline, sparklesOutline
     });
   }
-
 
   async ngOnInit() {
     await this.taskService.loadTasks();
@@ -73,7 +70,6 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Limpiar suscripciones para evitar memory leaks
     this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 
@@ -81,7 +77,6 @@ export class Tab3Page implements OnInit, OnDestroy {
     const taskId = event.detail.value;
     this.selectedTask = this.tasks.find(task => task.id === taskId);
     this.subtasks = this.selectedTask ? this.selectedTask.subtasks || [] : [];
-    // Salir del modo de edición si cambiamos de tarea
     this.editingSubtask = null;
   }
 
@@ -115,69 +110,63 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.generateAISubtasks();
   }
 
-async generateAISubtasks() {
-  try {
-    // 1. PRIMERO obtenemos el número de subtareas
-    const numberOfSubtasks = await this.promptForSubtaskCount();
-    
-    // Si el usuario cancela, salimos sin mostrar el loader
-    if (!numberOfSubtasks) {
-      return;
-    }
-    
-    // DEBUG: Verificar la URL que se está usando
-    console.log('🔍 Backend URL configurada:', (this.aiTaskService as any).backendUrl);
-    console.log('📦 Tarea a procesar:', this.selectedTask);
-    console.log('🔢 Número de subtareas:', numberOfSubtasks);
-    
-    // 2. DESPUÉS mostramos el loading
-    const loading = await this.loadingController.create({
-      message: 'Generando subtareas con IA...',
-      spinner: 'crescent'
-    });
-    await loading.present();
-    this.isGeneratingSubtasks = true;
-
-    // Usar finalize para asegurar que siempre se complete
-    const sub = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
-      .pipe(
-        finalize(() => {
-          loading.dismiss();
-          this.isGeneratingSubtasks = false;
-        })
-      )
-      .subscribe({
-        next: async (generatedSubtasks) => {
-          console.log("✅ Subtareas recibidas:", generatedSubtasks);
-          this.subtasks = generatedSubtasks;
-          await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
-          this.showToast('Subtareas generadas con IA exitosamente');
-        },
-        error: async (error) => {
-          console.error('❌ Error en generación de subtareas:', error);
-          this.showToast('Error al generar subtareas. Usando plantilla base.');
-          
-          const defaultSubtasks = Array.from({ length: numberOfSubtasks }, (_, i) => ({
-            id: Date.now() + i,
-            title: `${this.selectedTask.title} - Parte ${i + 1}`,
-            duration: '30 min',
-            status: 'Pendiente',
-            completed: false
-          }));
-          
-          this.subtasks = defaultSubtasks;
-          await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-        }
+  async generateAISubtasks() {
+    try {
+      const numberOfSubtasks = await this.promptForSubtaskCount();
+      
+      if (!numberOfSubtasks) {
+        return;
+      }
+      
+      console.log('🔍 Backend URL configurada:', (this.aiTaskService as any).backendUrl);
+      console.log('📦 Tarea a procesar:', this.selectedTask);
+      console.log('🔢 Número de subtareas:', numberOfSubtasks);
+      
+      const loading = await this.loadingController.create({
+        message: 'Generando subtareas con IA...',
+        spinner: 'crescent'
       });
-    
-    this.subscriptions.push(sub);
-  } catch (error) {
-    console.error("❌ Error general:", error);
-    this.isGeneratingSubtasks = false;
-    this.showToast('Ocurrió un error al procesar la solicitud');
-  }
-}
+      await loading.present();
+      this.isGeneratingSubtasks = true;
 
+      const sub = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
+        .pipe(
+          finalize(() => {
+            loading.dismiss();
+            this.isGeneratingSubtasks = false;
+          })
+        )
+        .subscribe({
+          next: async (generatedSubtasks) => {
+            console.log("✅ Subtareas recibidas:", generatedSubtasks);
+            this.subtasks = generatedSubtasks;
+            await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
+            this.showToast('Subtareas generadas con IA exitosamente');
+          },
+          error: async (error) => {
+            console.error('❌ Error en generación de subtareas:', error);
+            this.showToast('Error al generar subtareas. Usando plantilla base.');
+            
+            const defaultSubtasks = Array.from({ length: numberOfSubtasks }, (_, i) => ({
+              id: Date.now() + i,
+              title: `${this.selectedTask.title} - Parte ${i + 1}`,
+              duration: '30 min',
+              status: 'Pendiente',
+              completed: false
+            }));
+            
+            this.subtasks = defaultSubtasks;
+            await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
+          }
+        });
+      
+      this.subscriptions.push(sub);
+    } catch (error) {
+      console.error("❌ Error general:", error);
+      this.isGeneratingSubtasks = false;
+      this.showToast('Ocurrió un error al procesar la solicitud');
+    }
+  }
 
   async promptForSubtaskCount(): Promise<number | null> {
     return new Promise(async (resolve) => {
@@ -224,14 +213,12 @@ async generateAISubtasks() {
       return;
     }
     
-    // Lógica para iniciar la subtarea
     subtask.status = 'En progreso';
     this.updateSubtaskInService(subtask);
     this.showToast('Subtarea iniciada');
   }
   
   editSubtask(subtask: any) {
-    // Clonar el objeto para edición
     this.editingSubtask = { ...subtask };
   }
   
@@ -242,20 +229,14 @@ async generateAISubtasks() {
   async saveEdit() {
     if (!this.editingSubtask) return;
     
-    // Actualizar la subtarea en el array local
     const index = this.subtasks.findIndex(s => s.id === this.editingSubtask.id);
     if (index !== -1) {
-      // Actualizar el estado de completado basado en el estado seleccionado
       if (this.editingSubtask.status === 'Completada') {
         this.editingSubtask.completed = true;
       }
       
       this.subtasks[index] = { ...this.editingSubtask };
-      
-      // Actualizar en el servicio
       this.updateSubtaskInService(this.editingSubtask);
-      
-      // Salir del modo de edición
       this.editingSubtask = null;
       this.showToast('Subtarea actualizada correctamente');
     }
@@ -264,11 +245,9 @@ async generateAISubtasks() {
   async toggleComplete(subtask: any) {
     subtask.completed = !subtask.completed;
     
-    // Si se marca como completada, actualizar el estado
     if (subtask.completed) {
       subtask.status = 'Completada';
     } else if (subtask.status === 'Completada') {
-      // Si estaba completada, volver a pendiente
       subtask.status = 'Pendiente';
     }
     
@@ -300,7 +279,6 @@ async generateAISubtasks() {
     await alert.present();
   }
   
-  // Método auxiliar para actualizar una subtarea en el servicio
   private async updateSubtaskInService(updatedSubtask: any) {
     const index = this.subtasks.findIndex(s => s.id === updatedSubtask.id);
     if (index !== -1) {
@@ -310,7 +288,6 @@ async generateAISubtasks() {
     }
   }
   
-  // Método para mostrar mensajes toast
   private async showToast(message: string) {
     const toast = await this.toastController.create({
       message: message,
