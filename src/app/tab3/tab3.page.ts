@@ -15,7 +15,7 @@ import { NgClass, NgFor, NgIf } from '@angular/common';
 import { IonThumbnail } from '@ionic/angular/standalone';
 import { FormsModule } from '@angular/forms';
 import { AlertController, ToastController, LoadingController } from '@ionic/angular';
-import { finalize, Subscription } from 'rxjs';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tab3',
@@ -45,7 +45,6 @@ export class Tab3Page implements OnInit, OnDestroy {
     private alertController: AlertController,
     private toastController: ToastController,
     private loadingController: LoadingController
-    // ✅ Eliminado HttpClient - no es necesario aquí
   ) {
     addIcons({ 
       addCircleOutline, createOutline, checkmarkOutline, closeOutline, cutOutline,
@@ -112,6 +111,7 @@ export class Tab3Page implements OnInit, OnDestroy {
 
   async generateAISubtasks() {
     console.log('🚀 INICIO generateAISubtasks');
+    
     try {
       console.log('📍 Paso 1: Pidiendo número de subtareas');
       const numberOfSubtasks = await this.promptForSubtaskCount();
@@ -131,29 +131,31 @@ export class Tab3Page implements OnInit, OnDestroy {
         message: 'Generando subtareas con IA...',
         spinner: 'crescent'
       });
+      
       console.log('📍 Paso 4: Mostrando loading');
       await loading.present();
       this.isGeneratingSubtasks = true;
 
       console.log('📍 Paso 5: Llamando a aiTaskService.generateSubtasks');
-      const sub = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
-        .pipe(
-          finalize(() => {
-            console.log('📍 Paso FINAL: Finalizando');
-            loading.dismiss();
-            this.isGeneratingSubtasks = false;
-          })
-        )
+      
+      // Simplificado sin pipe ni finalize
+      this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
         .subscribe({
           next: async (generatedSubtasks) => {
-            console.log("✅ Subtareas recibidas:", generatedSubtasks);
+            console.log('📍 Paso 6: Subtareas recibidas:', generatedSubtasks);
+            
             this.subtasks = generatedSubtasks;
             await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
-            this.showToast('Subtareas generadas con IA exitosamente');
+            
+            console.log('📍 Paso 7: Cerrando loading');
+            await loading.dismiss();
+            this.isGeneratingSubtasks = false;
+            
+            this.showToast('Subtareas generadas exitosamente ✨');
+            console.log('✅ PROCESO COMPLETADO');
           },
           error: async (error) => {
-            console.error('❌ Error en generación de subtareas:', error);
-            this.showToast('Error al generar subtareas. Usando plantilla base.');
+            console.error('❌ Error en subscribe:', error);
             
             const defaultSubtasks = Array.from({ length: numberOfSubtasks }, (_, i) => ({
               id: Date.now() + i,
@@ -165,12 +167,18 @@ export class Tab3Page implements OnInit, OnDestroy {
             
             this.subtasks = defaultSubtasks;
             await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
+            await loading.dismiss();
+            this.isGeneratingSubtasks = false;
+            
+            this.showToast('Error al generar subtareas');
+          },
+          complete: () => {
+            console.log('📍 Observable completado');
           }
         });
       
-      console.log('📍 Paso 6: Subscription creada');
-      this.subscriptions.push(sub);
-      console.log('📍 Paso 7: FIN generateAISubtasks');
+      console.log('📍 Paso 8: Subscribe creado, esperando respuesta...');
+      
     } catch (error) {
       console.error("❌ Error general en generateAISubtasks:", error);
       this.isGeneratingSubtasks = false;
