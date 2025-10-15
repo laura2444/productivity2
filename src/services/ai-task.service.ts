@@ -1,29 +1,22 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, of, throwError } from 'rxjs';
-import { catchError, map, tap, timeout } from 'rxjs/operators';
+import { Observable, of } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AiTaskService {
-  // ✅ CORRECTO: Solo hasta /api (sin /generate-subtasks)
   private backendUrl = 'https://productivityback.onrender.com/api';
   
-  constructor(private http: HttpClient) {
+  constructor() {
     console.log('🔧 AiTaskService inicializado');
     console.log('🔗 Backend URL base:', this.backendUrl);
   }
 
   generateSubtasks(task: any, count: number = 3): Observable<any[]> {
     if (!task || !task.title) {
-      console.error('Se requiere título de tarea para generar subtareas');
-      return throwError(() => new Error('Datos de tarea incompletos'));
+      console.error('❌ Se requiere título de tarea');
+      return of(this.generateDefaultSubtasks(task, count));
     }
-
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/json'
-    });
 
     const body = {
       task: {
@@ -34,49 +27,60 @@ export class AiTaskService {
     };
 
     const fullUrl = `${this.backendUrl}/generate-subtasks`;
-    console.log("📤 Enviando solicitud al backend");
+    console.log("📤 Enviando solicitud con FETCH");
     console.log("🔗 URL completa:", fullUrl);
     console.log("📦 Body:", body);
 
-    return this.http.post<any>(fullUrl, body, { headers }).pipe(
-      timeout(60000), // 60 segundos para cold start de Render
-      tap(response => console.log("✅ Respuesta del backend:", response)),
-      map((response: any) => {
-        if (!response.success || !response.subtasks) {
+    // Usar fetch nativo en lugar de HttpClient
+    return new Observable(observer => {
+      const timeoutId = setTimeout(() => {
+        console.warn('⏱️ Timeout: Usando subtareas por defecto');
+        observer.next(this.generateDefaultSubtasks(task, count));
+        observer.complete();
+      }, 60000); // 60 segundos timeout
+
+      fetch(fullUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+      .then(response => {
+        clearTimeout(timeoutId);
+        console.log("📡 Respuesta recibida - Status:", response.status);
+        
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("✅ Datos parseados:", data);
+        
+        if (data.success && data.subtasks && Array.isArray(data.subtasks)) {
+          console.log("🎉 Subtareas generadas correctamente:", data.subtasks.length);
+          observer.next(data.subtasks);
+          observer.complete();
+        } else {
           throw new Error('Respuesta inválida del servidor');
         }
-        
-        console.log("📋 Subtareas recibidas:", response.subtasks);
-        
-        if (response.fallback) {
-          console.warn('⚠️ Usando subtareas por defecto:', response.message);
-        }
-        
-        return response.subtasks;
-      }),
-      catchError((error: HttpErrorResponse | Error) => {
-        console.error('❌ Error en solicitud al backend:', error);
-        
-        if (error instanceof HttpErrorResponse) {
-          console.error('🔴 Detalles del error HTTP:', {
-            status: error.status,
-            statusText: error.statusText,
-            url: error.url,
-            message: error.message
-          });
-          if (error.error) {
-            console.error('📄 Respuesta de error:', error.error);
-          }
-        }
-        
-        const defaultSubtasks = this.generateDefaultSubtasks(task, count);
-        console.log("📝 Retornando subtareas por defecto:", defaultSubtasks);
-        return of(defaultSubtasks);
       })
-    );
+      .catch(error => {
+        clearTimeout(timeoutId);
+        console.error('❌ Error en fetch:', error.message);
+        console.log('📝 Usando subtareas por defecto debido al error');
+        
+        const defaults = this.generateDefaultSubtasks(task, count);
+        observer.next(defaults);
+        observer.complete();
+      });
+    });
   }
 
   private generateDefaultSubtasks(task: any, count: number): any[] {
+    console.log('🔨 Generando subtareas por defecto');
+    
     return Array.from({ length: count }, (_, i) => {
       let subtaskTitle = '';
       let subtaskDescription = '';

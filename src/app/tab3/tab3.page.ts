@@ -111,10 +111,14 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   async generateAISubtasks() {
+    console.log('🚀 INICIO generateAISubtasks');
     try {
+      console.log('📍 Paso 1: Pidiendo número de subtareas');
       const numberOfSubtasks = await this.promptForSubtaskCount();
+      console.log('📍 Paso 2: Número recibido:', numberOfSubtasks);
       
       if (!numberOfSubtasks) {
+        console.log('⚠️ Usuario canceló');
         return;
       }
       
@@ -122,16 +126,20 @@ export class Tab3Page implements OnInit, OnDestroy {
       console.log('📦 Tarea a procesar:', this.selectedTask);
       console.log('🔢 Número de subtareas:', numberOfSubtasks);
       
+      console.log('📍 Paso 3: Creando loading');
       const loading = await this.loadingController.create({
         message: 'Generando subtareas con IA...',
         spinner: 'crescent'
       });
+      console.log('📍 Paso 4: Mostrando loading');
       await loading.present();
       this.isGeneratingSubtasks = true;
 
+      console.log('📍 Paso 5: Llamando a aiTaskService.generateSubtasks');
       const sub = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
         .pipe(
           finalize(() => {
+            console.log('📍 Paso FINAL: Finalizando');
             loading.dismiss();
             this.isGeneratingSubtasks = false;
           })
@@ -160,9 +168,11 @@ export class Tab3Page implements OnInit, OnDestroy {
           }
         });
       
+      console.log('📍 Paso 6: Subscription creada');
       this.subscriptions.push(sub);
+      console.log('📍 Paso 7: FIN generateAISubtasks');
     } catch (error) {
-      console.error("❌ Error general:", error);
+      console.error("❌ Error general en generateAISubtasks:", error);
       this.isGeneratingSubtasks = false;
       this.showToast('Ocurrió un error al procesar la solicitud');
     }
