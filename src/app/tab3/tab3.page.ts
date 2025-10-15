@@ -131,15 +131,29 @@ export class Tab3Page implements OnInit, OnDestroy {
     console.log('📦 Tarea a procesar:', this.selectedTask);
     console.log('📍 Paso 3: Creando loading');
     
-    const loading = await this.loadingController.create({
-      message: 'Generando subtareas con IA...',
-      spinner: 'crescent'
-    });
+    let loading: HTMLIonLoadingElement | undefined;
+    try {
+      loading = await this.loadingController.create({
+        message: 'Generando subtareas con IA...',
+        spinner: 'crescent'
+      });
+      console.log('📍 Paso 4: Loading creado exitosamente');
+    } catch (error) {
+      console.error('❌ Error creando loading:', error);
+    }
     
-    console.log('📍 Paso 4: Mostrando loading');
-    await loading.present();
+    console.log('📍 Paso 5: Mostrando loading');
+    if (loading) {
+      try {
+        await loading.present();
+        console.log('📍 Paso 6: Loading presentado exitosamente');
+      } catch (error) {
+        console.error('❌ Error presentando loading:', error);
+      }
+    }
+    
     this.isGeneratingSubtasks = true;
-    console.log('📍 Paso 5: isGeneratingSubtasks ahora es TRUE');
+    console.log('📍 Paso 7: isGeneratingSubtasks ahora es TRUE');
 
     console.log('📍 Paso 6: Verificando aiTaskService');
     console.log('   - aiTaskService existe?', !!this.aiTaskService);
@@ -166,7 +180,9 @@ export class Tab3Page implements OnInit, OnDestroy {
             if (generatedSubtasks && generatedSubtasks.length > 0) {
               this.subtasks = generatedSubtasks;
               await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
-              await loading.dismiss();
+              if (loading) {
+                await loading.dismiss();
+              }
               this.isGeneratingSubtasks = false;
               this.showToast('Subtareas generadas exitosamente ✨');
             } else {
@@ -177,7 +193,9 @@ export class Tab3Page implements OnInit, OnDestroy {
             const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
             this.subtasks = defaultSubtasks;
             await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-            await loading.dismiss();
+            if (loading) {
+              await loading.dismiss();
+            }
             this.isGeneratingSubtasks = false;
             this.showToast('Usando subtareas por defecto');
           }
@@ -185,9 +203,11 @@ export class Tab3Page implements OnInit, OnDestroy {
         error: async (error) => {
           console.error('❌❌❌ ERROR EJECUTADO:', error);
           const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
-          this.subtasks = defaultSubtasks;
-          await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-          await loading.dismiss();
+          if (loading) {
+            await loading.dismiss();
+          }
+          this.isGeneratingSubtasks = false;
+          this.showToast('Error: usando subtareas por defecto');
           this.isGeneratingSubtasks = false;
           this.showToast('Error: usando subtareas por defecto');
         },
@@ -200,16 +220,17 @@ export class Tab3Page implements OnInit, OnDestroy {
       
     } catch (error) {
       console.error('❌ ERROR GENERAL CAPTURADO:', error);
-      console.error('   Stack:', (error as any).stack);
       const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
-      this.subtasks = defaultSubtasks;
+      if (loading) {
+        await loading.dismiss();
+      }
+      this.isGeneratingSubtasks = false;
+      this.showToast('Error fatal: usando subtareas por defecto');
       await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-      await loading.dismiss();
       this.isGeneratingSubtasks = false;
       this.showToast('Error fatal: usando subtareas por defecto');
     }
   }
-
   private createDefaultSubtasks(count: number): any[] {
     return Array.from({ length: count }, (_, i) => ({
       id: Date.now() + i + Math.random() * 100,
