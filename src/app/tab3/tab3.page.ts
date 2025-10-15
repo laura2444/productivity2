@@ -111,15 +111,17 @@ export class Tab3Page implements OnInit, OnDestroy {
 
   async generateAISubtasks() {
     console.log('🚀 INICIO generateAISubtasks');
+    console.log('📊 Estado isGeneratingSubtasks:', this.isGeneratingSubtasks);
     
     // Prevenir ejecución múltiple
     if (this.isGeneratingSubtasks) {
-      console.warn('⚠️ Ya hay una generación en proceso');
+      console.warn('⚠️ Ya hay una generación en proceso - ABORTANDO');
       return;
     }
     
+    console.log('📍 Paso 1: Pidiendo número de subtareas');
     const numberOfSubtasks = await this.promptForSubtaskCount();
-    console.log('📍 Número recibido:', numberOfSubtasks);
+    console.log('📍 Paso 2: Número recibido:', numberOfSubtasks);
     
     if (!numberOfSubtasks) {
       console.log('⚠️ Usuario canceló');
@@ -127,23 +129,38 @@ export class Tab3Page implements OnInit, OnDestroy {
     }
     
     console.log('📦 Tarea a procesar:', this.selectedTask);
+    console.log('📍 Paso 3: Creando loading');
     
     const loading = await this.loadingController.create({
       message: 'Generando subtareas con IA...',
       spinner: 'crescent'
     });
     
+    console.log('📍 Paso 4: Mostrando loading');
     await loading.present();
     this.isGeneratingSubtasks = true;
+    console.log('📍 Paso 5: isGeneratingSubtasks ahora es TRUE');
 
-    console.log('📍 Llamando al servicio AI - Iniciando subscribe');
-    
-    // Usar lastValueFrom en lugar de toPromise (Angular 16+)
-    this.aiTaskService
-      .generateSubtasks(this.selectedTask, numberOfSubtasks)
-      .subscribe({
+    console.log('📍 Paso 6: Verificando aiTaskService');
+    console.log('   - aiTaskService existe?', !!this.aiTaskService);
+    console.log('   - aiTaskService.generateSubtasks existe?', !!this.aiTaskService.generateSubtasks);
+    console.log('   - Tipo:', typeof this.aiTaskService.generateSubtasks);
+
+    try {
+      console.log('📍 Paso 7: LLAMANDO a aiTaskService.generateSubtasks()');
+      
+      const observable = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks);
+      
+      console.log('📍 Paso 8: Observable retornado:', observable);
+      console.log('   - Observable es null?', observable === null);
+      console.log('   - Observable es undefined?', observable === undefined);
+      console.log('   - Observable tiene subscribe?', !!observable?.subscribe);
+      
+      console.log('📍 Paso 9: Iniciando subscribe...');
+      
+      observable.subscribe({
         next: async (generatedSubtasks) => {
-          console.log('✅ Subtareas recibidas en next:', generatedSubtasks);
+          console.log('✅✅✅ NEXT EJECUTADO - Subtareas recibidas:', generatedSubtasks);
           
           try {
             if (generatedSubtasks && generatedSubtasks.length > 0) {
@@ -166,7 +183,7 @@ export class Tab3Page implements OnInit, OnDestroy {
           }
         },
         error: async (error) => {
-          console.error('❌ Error en subscribe:', error);
+          console.error('❌❌❌ ERROR EJECUTADO:', error);
           const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
           this.subtasks = defaultSubtasks;
           await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
@@ -175,9 +192,22 @@ export class Tab3Page implements OnInit, OnDestroy {
           this.showToast('Error: usando subtareas por defecto');
         },
         complete: () => {
-          console.log('✅ Observable completado');
+          console.log('✅ COMPLETE EJECUTADO');
         }
       });
+      
+      console.log('📍 Paso 10: Subscribe creado, esperando eventos...');
+      
+    } catch (error) {
+      console.error('❌ ERROR GENERAL CAPTURADO:', error);
+      console.error('   Stack:', (error as any).stack);
+      const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
+      this.subtasks = defaultSubtasks;
+      await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
+      await loading.dismiss();
+      this.isGeneratingSubtasks = false;
+      this.showToast('Error fatal: usando subtareas por defecto');
+    }
   }
 
   private createDefaultSubtasks(count: number): any[] {
