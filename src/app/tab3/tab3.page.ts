@@ -110,138 +110,55 @@ export class Tab3Page implements OnInit, OnDestroy {
   }
 
   async generateAISubtasks() {
-    console.log('🚀 INICIO generateAISubtasks');
-    console.log('📊 Estado isGeneratingSubtasks:', this.isGeneratingSubtasks);
+    if (this.isGeneratingSubtasks) return;
     
-    // Prevenir ejecución múltiple
-    if (this.isGeneratingSubtasks) {
-      console.warn('⚠️ Ya hay una generación en proceso - ABORTANDO');
-      return;
-    }
-    
-    console.log('📍 Paso 1: Pidiendo número de subtareas');
     const numberOfSubtasks = await this.promptForSubtaskCount();
-    console.log('📍 Paso 2: Número recibido:', numberOfSubtasks);
-    
-    if (!numberOfSubtasks) {
-      console.log('⚠️ Usuario canceló');
-      return;
-    }
-    
-    console.log('📦 Tarea a procesar:', this.selectedTask);
-    console.log('📍 Paso 3: Creando loading');
-    
-    let loading: HTMLIonLoadingElement | undefined;
-    try {
-      loading = await this.loadingController.create({
-        message: 'Generando subtareas con IA...',
-        spinner: 'crescent'
-      });
-      console.log('📍 Paso 4: Loading creado exitosamente');
-    } catch (error) {
-      console.error('❌ Error creando loading:', error);
-    }
-    
-    console.log('📍 Paso 5: Mostrando loading');
-    if (loading) {
-      try {
-        await loading.present();
-        console.log('📍 Paso 6: Loading presentado exitosamente');
-      } catch (error) {
-        console.error('❌ Error presentando loading:', error);
-      }
-    }
+    if (!numberOfSubtasks) return;
     
     this.isGeneratingSubtasks = true;
-    console.log('📍 Paso 7: isGeneratingSubtasks ahora es TRUE');
+    
+    // Mostrar loading sin await problemático
+    let loading: any = null;
+    this.loadingController.create({
+      message: 'Generando subtareas con IA...',
+      spinner: 'crescent'
+    }).then(l => {
+      loading = l;
+      loading.present();
+    });
 
-    console.log('📍 Paso 6: Verificando aiTaskService');
-    console.log('   - aiTaskService existe?', !!this.aiTaskService);
-    console.log('   - aiTaskService.generateSubtasks existe?', !!this.aiTaskService.generateSubtasks);
-    console.log('   - Tipo:', typeof this.aiTaskService.generateSubtasks);
-
-    try {
-      console.log('📍 Paso 7: LLAMANDO a aiTaskService.generateSubtasks()');
-      
-      const observable = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks);
-      
-      console.log('📍 Paso 8: Observable retornado:', observable);
-      console.log('   - Observable es null?', observable === null);
-      console.log('   - Observable es undefined?', observable === undefined);
-      console.log('   - Observable tiene subscribe?', !!observable?.subscribe);
-      
-      console.log('📍 Paso 9: Iniciando subscribe...');
-      
-      observable.subscribe({
+    // Ejecutar la generación sin depender del loading
+    this.aiTaskService
+      .generateSubtasks(this.selectedTask, numberOfSubtasks)
+      .subscribe({
         next: async (generatedSubtasks) => {
-          console.log('✅✅✅ NEXT EJECUTADO - Subtareas recibidas:', generatedSubtasks);
-          
-          try {
-            if (generatedSubtasks && generatedSubtasks.length > 0) {
-              this.subtasks = generatedSubtasks;
-              await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
-              if (loading) {
-                await loading.dismiss();
-              }
-              this.isGeneratingSubtasks = false;
-              this.showToast('Subtareas generadas exitosamente ✨');
-            } else {
-              throw new Error('No se recibieron subtareas');
-            }
-          } catch (error) {
-            console.error('❌ Error procesando subtareas:', error);
-            const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
-            this.subtasks = defaultSubtasks;
-            await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-            if (loading) {
-              await loading.dismiss();
-            }
-            this.isGeneratingSubtasks = false;
-            this.showToast('Usando subtareas por defecto');
-          }
+          this.subtasks = generatedSubtasks;
+          await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
+          this.isGeneratingSubtasks = false;
+          if (loading) loading.dismiss();
+          this.showToast('Subtareas generadas exitosamente ✨');
         },
         error: async (error) => {
-          console.error('❌❌❌ ERROR EJECUTADO:', error);
           const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
-          if (loading) {
-            await loading.dismiss();
-          }
+          this.subtasks = defaultSubtasks;
+          await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
           this.isGeneratingSubtasks = false;
-          this.showToast('Error: usando subtareas por defecto');
-          this.isGeneratingSubtasks = false;
-          this.showToast('Error: usando subtareas por defecto');
-        },
-        complete: () => {
-          console.log('✅ COMPLETE EJECUTADO');
+          if (loading) loading.dismiss();
+          this.showToast('Subtareas generadas');
         }
       });
-      
-      console.log('📍 Paso 10: Subscribe creado, esperando eventos...');
-      
-    } catch (error) {
-      console.error('❌ ERROR GENERAL CAPTURADO:', error);
-      const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
-      if (loading) {
-        await loading.dismiss();
-      }
-      this.isGeneratingSubtasks = false;
-      this.showToast('Error fatal: usando subtareas por defecto');
-      await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-      this.isGeneratingSubtasks = false;
-      this.showToast('Error fatal: usando subtareas por defecto');
-    }
   }
+
   private createDefaultSubtasks(count: number): any[] {
     return Array.from({ length: count }, (_, i) => ({
       id: Date.now() + i + Math.random() * 100,
       title: `${this.selectedTask.title} - Parte ${i + 1}`,
-      description: `Completar la parte ${i + 1} de "${this.selectedTask.title}"`,
+      description: `Completar la parte ${i + 1}`,
       duration: '45 min',
       status: 'Pendiente',
       completed: false
     }));
   }
-
 
 
   async promptForSubtaskCount(): Promise<number | null> {
