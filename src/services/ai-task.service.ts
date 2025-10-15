@@ -7,7 +7,7 @@ import { catchError, map, tap, timeout } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AiTaskService {
-  private backendUrl = 'https://productivityback.onrender.com/api';
+  private backendUrl = 'https://productivityback.onrender.com/api/generate-subtasks';
   
   constructor(private http: HttpClient) {}
 
