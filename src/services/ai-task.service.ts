@@ -7,9 +7,13 @@ import { catchError, map, tap, timeout } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AiTaskService {
-  private backendUrl = 'https://productivityback.onrender.com/api/generate-subtasks';
+  // ✅ CORRECTO: Solo hasta /api (sin /generate-subtasks)
+  private backendUrl = 'https://productivityback.onrender.com/api';
   
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) {
+    console.log('🔧 AiTaskService inicializado');
+    console.log('🔗 Backend URL base:', this.backendUrl);
+  }
 
   generateSubtasks(task: any, count: number = 3): Observable<any[]> {
     if (!task || !task.title) {
@@ -29,36 +33,44 @@ export class AiTaskService {
       count: count
     };
 
-    console.log("Enviando solicitud al backend:", body);
+    const fullUrl = `${this.backendUrl}/generate-subtasks`;
+    console.log("📤 Enviando solicitud al backend");
+    console.log("🔗 URL completa:", fullUrl);
+    console.log("📦 Body:", body);
 
-    return this.http.post<any>(`${this.backendUrl}/generate-subtasks`, body, { headers }).pipe(
+    return this.http.post<any>(fullUrl, body, { headers }).pipe(
       timeout(60000), // 60 segundos para cold start de Render
-      tap(response => console.log("Respuesta del backend:", response)),
+      tap(response => console.log("✅ Respuesta del backend:", response)),
       map((response: any) => {
         if (!response.success || !response.subtasks) {
           throw new Error('Respuesta inválida del servidor');
         }
         
-        console.log("Subtareas recibidas:", response.subtasks);
+        console.log("📋 Subtareas recibidas:", response.subtasks);
         
         if (response.fallback) {
-          console.warn('Usando subtareas por defecto:', response.message);
+          console.warn('⚠️ Usando subtareas por defecto:', response.message);
         }
         
         return response.subtasks;
       }),
       catchError((error: HttpErrorResponse | Error) => {
-        console.error('Error en solicitud al backend:', error);
+        console.error('❌ Error en solicitud al backend:', error);
         
         if (error instanceof HttpErrorResponse) {
-          console.error('Detalles del error HTTP:', error.status, error.statusText);
+          console.error('🔴 Detalles del error HTTP:', {
+            status: error.status,
+            statusText: error.statusText,
+            url: error.url,
+            message: error.message
+          });
           if (error.error) {
-            console.error('Mensaje de error específico:', JSON.stringify(error.error));
+            console.error('📄 Respuesta de error:', error.error);
           }
         }
         
         const defaultSubtasks = this.generateDefaultSubtasks(task, count);
-        console.log("Retornando subtareas por defecto (error de conexión):", defaultSubtasks);
+        console.log("📝 Retornando subtareas por defecto:", defaultSubtasks);
         return of(defaultSubtasks);
       })
     );
