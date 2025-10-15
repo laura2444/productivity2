@@ -115,63 +115,68 @@ export class Tab3Page implements OnInit, OnDestroy {
     this.generateAISubtasks();
   }
 
-  async generateAISubtasks() {
-    try {
-      // 1. PRIMERO obtenemos el número de subtareas
-      const numberOfSubtasks = await this.promptForSubtaskCount();
-      
-      // Si el usuario cancela, salimos sin mostrar el loader
-      if (!numberOfSubtasks) {
-        return;
-      }
-      
-      // 2. DESPUÉS mostramos el loading
-      const loading = await this.loadingController.create({
-        message: 'Generando subtareas con IA...',
-        spinner: 'crescent'
-      });
-      await loading.present();
-      this.isGeneratingSubtasks = true;
-  
-      // Usar finalize para asegurar que siempre se complete
-      const sub = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
-        .pipe(
-          finalize(() => {
-            loading.dismiss();
-            this.isGeneratingSubtasks = false;
-          })
-        )
-        .subscribe({
-          next: async (generatedSubtasks) => {
-            console.log("Subtareas recibidas:", generatedSubtasks);
-            this.subtasks = generatedSubtasks;
-            await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
-            this.showToast('Subtareas generadas con IA exitosamente');
-          },
-          error: async (error) => {
-            console.error('Error en generación de subtareas:', error);
-            this.showToast('Error al generar subtareas. Usando plantilla base.');
-            
-            const defaultSubtasks = Array.from({ length: numberOfSubtasks }, (_, i) => ({
-              id: Date.now() + i,
-              title: `${this.selectedTask.title} - Parte ${i + 1}`,
-              duration: '30 min',
-              status: 'Pendiente',
-              completed: false
-            }));
-            
-            this.subtasks = defaultSubtasks;
-            await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-          }
-        });
-      
-      this.subscriptions.push(sub);
-    } catch (error) {
-      console.error("Error general:", error);
-      this.isGeneratingSubtasks = false;
-      this.showToast('Ocurrió un error al procesar la solicitud');
+async generateAISubtasks() {
+  try {
+    // 1. PRIMERO obtenemos el número de subtareas
+    const numberOfSubtasks = await this.promptForSubtaskCount();
+    
+    // Si el usuario cancela, salimos sin mostrar el loader
+    if (!numberOfSubtasks) {
+      return;
     }
+    
+    // DEBUG: Verificar la URL que se está usando
+    console.log('🔍 Backend URL configurada:', (this.aiTaskService as any).backendUrl);
+    console.log('📦 Tarea a procesar:', this.selectedTask);
+    console.log('🔢 Número de subtareas:', numberOfSubtasks);
+    
+    // 2. DESPUÉS mostramos el loading
+    const loading = await this.loadingController.create({
+      message: 'Generando subtareas con IA...',
+      spinner: 'crescent'
+    });
+    await loading.present();
+    this.isGeneratingSubtasks = true;
+
+    // Usar finalize para asegurar que siempre se complete
+    const sub = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
+      .pipe(
+        finalize(() => {
+          loading.dismiss();
+          this.isGeneratingSubtasks = false;
+        })
+      )
+      .subscribe({
+        next: async (generatedSubtasks) => {
+          console.log("✅ Subtareas recibidas:", generatedSubtasks);
+          this.subtasks = generatedSubtasks;
+          await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
+          this.showToast('Subtareas generadas con IA exitosamente');
+        },
+        error: async (error) => {
+          console.error('❌ Error en generación de subtareas:', error);
+          this.showToast('Error al generar subtareas. Usando plantilla base.');
+          
+          const defaultSubtasks = Array.from({ length: numberOfSubtasks }, (_, i) => ({
+            id: Date.now() + i,
+            title: `${this.selectedTask.title} - Parte ${i + 1}`,
+            duration: '30 min',
+            status: 'Pendiente',
+            completed: false
+          }));
+          
+          this.subtasks = defaultSubtasks;
+          await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
+        }
+      });
+    
+    this.subscriptions.push(sub);
+  } catch (error) {
+    console.error("❌ Error general:", error);
+    this.isGeneratingSubtasks = false;
+    this.showToast('Ocurrió un error al procesar la solicitud');
   }
+}
 
 
   async promptForSubtaskCount(): Promise<number | null> {
