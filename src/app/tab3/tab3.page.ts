@@ -112,6 +112,12 @@ export class Tab3Page implements OnInit, OnDestroy {
   async generateAISubtasks() {
     console.log('🚀 INICIO generateAISubtasks');
     
+    // Prevenir ejecución múltiple
+    if (this.isGeneratingSubtasks) {
+      console.warn('⚠️ Ya hay una generación en proceso');
+      return;
+    }
+    
     const numberOfSubtasks = await this.promptForSubtaskCount();
     console.log('📍 Número recibido:', numberOfSubtasks);
     
@@ -124,45 +130,54 @@ export class Tab3Page implements OnInit, OnDestroy {
     
     const loading = await this.loadingController.create({
       message: 'Generando subtareas con IA...',
-      spinner: 'crescent',
-      duration: 70000 // Auto-cerrar después de 70 segundos
+      spinner: 'crescent'
     });
     
     await loading.present();
     this.isGeneratingSubtasks = true;
 
-    console.log('📍 Llamando al servicio AI');
+    console.log('📍 Llamando al servicio AI - Iniciando subscribe');
     
-    try {
-      // Usar toPromise() en lugar de subscribe
-      const generatedSubtasks = await this.aiTaskService
-        .generateSubtasks(this.selectedTask, numberOfSubtasks)
-        .toPromise();
-
-      console.log('✅ Subtareas recibidas:', generatedSubtasks);
-      
-      if (generatedSubtasks && generatedSubtasks.length > 0) {
-        this.subtasks = generatedSubtasks;
-        await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
-        this.showToast('Subtareas generadas exitosamente ✨');
-      } else {
-        throw new Error('No se recibieron subtareas');
-      }
-      
-    } catch (error) {
-      console.error('❌ Error:', error);
-      
-      // Generar subtareas por defecto
-      const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
-      this.subtasks = defaultSubtasks;
-      await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-      this.showToast('Usando subtareas por defecto');
-      
-    } finally {
-      await loading.dismiss();
-      this.isGeneratingSubtasks = false;
-      console.log('✅ Proceso finalizado');
-    }
+    // Usar lastValueFrom en lugar de toPromise (Angular 16+)
+    this.aiTaskService
+      .generateSubtasks(this.selectedTask, numberOfSubtasks)
+      .subscribe({
+        next: async (generatedSubtasks) => {
+          console.log('✅ Subtareas recibidas en next:', generatedSubtasks);
+          
+          try {
+            if (generatedSubtasks && generatedSubtasks.length > 0) {
+              this.subtasks = generatedSubtasks;
+              await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
+              await loading.dismiss();
+              this.isGeneratingSubtasks = false;
+              this.showToast('Subtareas generadas exitosamente ✨');
+            } else {
+              throw new Error('No se recibieron subtareas');
+            }
+          } catch (error) {
+            console.error('❌ Error procesando subtareas:', error);
+            const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
+            this.subtasks = defaultSubtasks;
+            await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
+            await loading.dismiss();
+            this.isGeneratingSubtasks = false;
+            this.showToast('Usando subtareas por defecto');
+          }
+        },
+        error: async (error) => {
+          console.error('❌ Error en subscribe:', error);
+          const defaultSubtasks = this.createDefaultSubtasks(numberOfSubtasks);
+          this.subtasks = defaultSubtasks;
+          await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
+          await loading.dismiss();
+          this.isGeneratingSubtasks = false;
+          this.showToast('Error: usando subtareas por defecto');
+        },
+        complete: () => {
+          console.log('✅ Observable completado');
+        }
+      });
   }
 
   private createDefaultSubtasks(count: number): any[] {
@@ -175,6 +190,8 @@ export class Tab3Page implements OnInit, OnDestroy {
       completed: false
     }));
   }
+
+
 
   async promptForSubtaskCount(): Promise<number | null> {
     return new Promise(async (resolve) => {
