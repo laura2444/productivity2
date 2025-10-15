@@ -9,7 +9,7 @@ import { environment } from 'src/environments/environment';
 })
 export class AiTaskService {
   // URL de tu backend - CAMBIA ESTO según tu configuración
-  private backendUrl = environment.backendUrl || 'http://localhost:3000/api';
+  private backendUrl = 'https://productivityback.onrender.com/api'
   
   constructor(private http: HttpClient) {}
 
