@@ -138,46 +138,63 @@ export class Tab3Page implements OnInit, OnDestroy {
 
       console.log('📍 Paso 5: Llamando a aiTaskService.generateSubtasks');
       
-      // Simplificado sin pipe ni finalize
-      this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
-        .subscribe({
-          next: async (generatedSubtasks) => {
-            console.log('📍 Paso 6: Subtareas recibidas:', generatedSubtasks);
-            
-            this.subtasks = generatedSubtasks;
-            await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
-            
-            console.log('📍 Paso 7: Cerrando loading');
-            await loading.dismiss();
-            this.isGeneratingSubtasks = false;
-            
-            this.showToast('Subtareas generadas exitosamente ✨');
-            console.log('✅ PROCESO COMPLETADO');
-          },
-          error: async (error) => {
-            console.error('❌ Error en subscribe:', error);
-            
-            const defaultSubtasks = Array.from({ length: numberOfSubtasks }, (_, i) => ({
-              id: Date.now() + i,
-              title: `${this.selectedTask.title} - Parte ${i + 1}`,
-              duration: '30 min',
-              status: 'Pendiente',
-              completed: false
-            }));
-            
-            this.subtasks = defaultSubtasks;
-            await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
-            await loading.dismiss();
-            this.isGeneratingSubtasks = false;
-            
-            this.showToast('Error al generar subtareas');
-          },
-          complete: () => {
-            console.log('📍 Observable completado');
-          }
-        });
-      
-      console.log('📍 Paso 8: Subscribe creado, esperando respuesta...');
+      // Crear una promesa del Observable para mejor control
+      const subtasksPromise = new Promise<any[]>((resolve, reject) => {
+        const subscription = this.aiTaskService.generateSubtasks(this.selectedTask, numberOfSubtasks)
+          .subscribe({
+            next: (generatedSubtasks) => {
+              console.log('📍 Paso 6: Subtareas recibidas:', generatedSubtasks);
+              resolve(generatedSubtasks);
+            },
+            error: (error) => {
+              console.error('❌ Error en subscribe:', error);
+              reject(error);
+            },
+            complete: () => {
+              console.log('📍 Observable completado');
+            }
+          });
+      });
+
+      try {
+        // Esperar las subtareas con timeout
+        const generatedSubtasks = await Promise.race([
+          subtasksPromise,
+          new Promise<any[]>((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 65000)
+          )
+        ]);
+
+        console.log('📍 Paso 7: Procesando subtareas recibidas');
+        this.subtasks = generatedSubtasks;
+        await this.taskService.addSubtasks(this.selectedTask.id, generatedSubtasks);
+        
+        console.log('📍 Paso 8: Cerrando loading');
+        await loading.dismiss();
+        this.isGeneratingSubtasks = false;
+        
+        this.showToast('Subtareas generadas exitosamente ✨');
+        console.log('✅ PROCESO COMPLETADO');
+        
+      } catch (error) {
+        console.error('❌ Error al esperar subtareas:', error);
+        
+        // Generar subtareas por defecto
+        const defaultSubtasks = Array.from({ length: numberOfSubtasks }, (_, i) => ({
+          id: Date.now() + i,
+          title: `${this.selectedTask.title} - Parte ${i + 1}`,
+          duration: '30 min',
+          status: 'Pendiente',
+          completed: false
+        }));
+        
+        this.subtasks = defaultSubtasks;
+        await this.taskService.addSubtasks(this.selectedTask.id, defaultSubtasks);
+        await loading.dismiss();
+        this.isGeneratingSubtasks = false;
+        
+        this.showToast('Usando subtareas por defecto (error de conexión)');
+      }
       
     } catch (error) {
       console.error("❌ Error general en generateAISubtasks:", error);
