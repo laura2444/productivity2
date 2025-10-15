@@ -2,19 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map, tap, timeout } from 'rxjs/operators';
-import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AiTaskService {
-  // URL de tu backend - CAMBIA ESTO según tu configuración
-  private backendUrl = 'https://productivityback.onrender.com/api'
+  private backendUrl = 'https://productivityback.onrender.com/api';
   
   constructor(private http: HttpClient) {}
 
   generateSubtasks(task: any, count: number = 3): Observable<any[]> {
-    // Verificar si tenemos los datos necesarios
     if (!task || !task.title) {
       console.error('Se requiere título de tarea para generar subtareas');
       return throwError(() => new Error('Datos de tarea incompletos'));
@@ -35,7 +32,7 @@ export class AiTaskService {
     console.log("Enviando solicitud al backend:", body);
 
     return this.http.post<any>(`${this.backendUrl}/generate-subtasks`, body, { headers }).pipe(
-      timeout(30000),
+      timeout(60000), // 60 segundos para cold start de Render
       tap(response => console.log("Respuesta del backend:", response)),
       map((response: any) => {
         if (!response.success || !response.subtasks) {
@@ -44,7 +41,6 @@ export class AiTaskService {
         
         console.log("Subtareas recibidas:", response.subtasks);
         
-        // Si es fallback, informar al usuario (opcional)
         if (response.fallback) {
           console.warn('Usando subtareas por defecto:', response.message);
         }
@@ -61,7 +57,6 @@ export class AiTaskService {
           }
         }
         
-        // Crear subtareas por defecto en caso de error de conexión
         const defaultSubtasks = this.generateDefaultSubtasks(task, count);
         console.log("Retornando subtareas por defecto (error de conexión):", defaultSubtasks);
         return of(defaultSubtasks);
@@ -69,7 +64,6 @@ export class AiTaskService {
     );
   }
 
-  // Método auxiliar para generar subtareas por defecto
   private generateDefaultSubtasks(task: any, count: number): any[] {
     return Array.from({ length: count }, (_, i) => {
       let subtaskTitle = '';
